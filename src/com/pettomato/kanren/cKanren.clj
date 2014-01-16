@@ -1,5 +1,5 @@
 (ns com.pettomato.kanren.cKanren
-  (:refer-clojure :exclude [== conj disj reify])
+  (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.muKanren :as mu]))
 
