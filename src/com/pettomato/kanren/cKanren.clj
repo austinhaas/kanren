@@ -11,6 +11,8 @@
   [[& vars] & gs]
   `(mu/fresh [~@vars] ~@gs))
 
+(defn pair? [x] (and (coll? x) (not (empty? x))))
+
 (declare process-prefix enforce-constraints reify-constraints)
 
 (defn make-a [s d c] [s d c])
@@ -30,13 +32,13 @@
 (defn any:lvar? [t]
   (cond
    (mu/lvar? t) true
-   (coll? t) (some any:lvar? t)
+   (pair? t) (some any:lvar? t)
    :else false))
 
 (defn any-relevant:lvar? [t x*]
   (cond
    (mu/lvar? t) (some (partial = t) x*)
-   (coll? t) (some #(any-relevant:lvar? % x*) t)
+   (pair? t) (some #(any-relevant:lvar? % x*) t)
    :else false))
 
 (defn ext:lvars [x r]
