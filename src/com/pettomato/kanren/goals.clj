@@ -1,14 +1,14 @@
 (ns com.pettomato.kanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.llist :refer (empty-llist)]
-   [com.pettomato.kanren.cKanren :refer (!= == fresh conde)]))
+   [com.pettomato.kanren.llist :refer (empty-llist lcons llist*)]
+   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run)]))
 
 (defn emptyo [l]
   (== l empty-llist))
 
 (defn conso [a d l]
-  (== [a d] l))
+  (== (lcons a d) l))
 
 (defn membero [x l]
   (fresh [head tail]

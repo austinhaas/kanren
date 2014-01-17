@@ -7,10 +7,13 @@
 
 (def empty-llist nil)
 
+(defn lcons [a d]
+  (vector a d))
+
 (defn llist [l]
   (if (empty? l)
     empty-llist
-    (vector (first l) (llist (rest l)))))
+    (lcons (first l) (llist (rest l)))))
 
 (defn llist* [& args]
   (llist args))
