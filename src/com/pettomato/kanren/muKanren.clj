@@ -105,7 +105,7 @@
 (defn take* [f]
   (case-inf (f)
             []    ()
-            [f]   (take* f)
+            [f]   (recur f)
             [a]   (cons a ())
             [a f] (cons a (lazy-seq (take* f)))))
 
