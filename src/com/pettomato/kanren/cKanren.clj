@@ -59,6 +59,14 @@
         (ext:lvars v (ext:lvars x r))
         (ext:lvars x r)))))
 
+(defn occurs-check [x v s]
+  (let [v (mu/walk v s)]
+    (cond
+     (mu/lvar? v) (mu/lvar=? v x)
+     (pair? v) (or (occurs-check x (first v) s)
+                   (recur x (rest v) s))
+     :else false)))
+
 (defn unify [e s]
   (if (empty? e)
     s
@@ -69,9 +77,13 @@
             v (mu/walk v s)]
         (cond
          (= u v) (unify e s)
-         (mu/lvar? u) (unify e (mu/ext-s u v s))
-         (mu/lvar? v) (unify e (mu/ext-s v u s))
-         (and (coll? u) (coll? v))
+         (mu/lvar? u)
+         (and (not (occurs-check u v s))
+              (unify e (mu/ext-s u v s)))
+         (mu/lvar? v)
+         (and (not (occurs-check v u s))
+              (unify e (mu/ext-s v u s)))
+         (and (pair? u) (pair? v))
          (recur (first u) (first v) (cons (list (rest u) (rest v)) e))
          :else false)))))
 
