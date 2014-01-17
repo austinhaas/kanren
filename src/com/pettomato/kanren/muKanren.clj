@@ -125,8 +125,8 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) v
-     (list? v) (map #(walk* % s) v)
-     (coll? v) (into (empty v) (map #(walk* % s) v))
+     (and (list? v) (not (empty? v))) (map #(walk* % s) v)
+     (and (coll? v) (not (empty? v))) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
 (def empty-s ())
