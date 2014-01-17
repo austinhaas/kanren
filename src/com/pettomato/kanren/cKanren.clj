@@ -81,15 +81,11 @@
     r
     (cons x r)))
 
-(def lhs first)
-(def rhs second)
-
 (defn recover:lvars [p]
   (if (empty? p)
     ()
-    (let [x (lhs (first p))
-          v (rhs (first p))
-          r (recover:lvars (rest p))]
+    (let [[[x v] & ps] p
+          r (recover:lvars ps)]
       (if (lvar? v)
         (ext:lvars v (ext:lvars x r))
         (ext:lvars x r)))))
