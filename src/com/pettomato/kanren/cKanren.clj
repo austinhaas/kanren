@@ -94,17 +94,6 @@
         (ext:lvars v (ext:lvars x r))
         (ext:lvars x r)))))
 
-(defn ext-c [oc c]
-  (if (any:lvar? (oc->rands oc))
-    (cons oc c)
-    c))
-
-(defn goal-construct [f]
-  (fn [[a c]]
-    (if-let [a' (f a)]
-      (unit [a' c])
-      mzero)))
-
 (defn prefix-s [s s']
   (if (empty? s)
     s'
@@ -115,18 +104,14 @@
         (recur (rest s') (cons (first s') acc))))))
 
 (defn ==c [u v]
-  (fn [a]
-    (let [[s d c] a]
-      (if-let [s' (unify (list [u v]) s)]
-        (if (= s s')
-          a
-          (let [p  (prefix-s s s')
-                a' (make-a s' d c)]
-            ((process-prefix p c) a')))
-        false))))
-
-(defn == [u v]
-  (goal-construct (==c u v)))
+  (fn [[s d c :as a]]
+    (if-let [s' (unify (list [u v]) s)]
+      (if (= s s')
+        a
+        (let [p  (prefix-s s s')
+              a' (make-a s' d c)]
+          ((process-prefix p c) a')))
+      false)))
 
 (defmacro build-aux-oc [op args zs args2]
   (if (empty? args)
@@ -144,47 +129,46 @@
 (declare normalize-store)
 
 (defn !=c-NEQ [p]
-  (fn [a]
-    (let [[s d c] a]
-      (if-let [s' (unify p s)]
-        (let [p' (prefix-s s s')]
-          (if (empty? p')
-            false
-            ((normalize-store p') a)))
-        a))))
+  (fn [[s d c :as a]]
+    (if-let [s' (unify p s)]
+      (let [p' (prefix-s s s')]
+        (if (empty? p')
+          false
+          ((normalize-store p') a)))
+      a)))
 
 (defn !=c [u v]
-  (fn [a]
-    (let [[s d c] a]
-      (if-let [s' (unify (list [u v]) s)]
-        ((!=c-NEQ (prefix-s s s')) a)
-        a))))
-
-(defn != [u v]
-  (goal-construct (!=c u v)))
+  (fn [[s d c :as a]]
+    (if-let [s' (unify (list [u v]) s)]
+      ((!=c-NEQ (prefix-s s s')) a)
+      a)))
 
 (defn subsumes? [p s]
   (if-let [s' (unify p s)]
     (= s s')
     false))
 
+(defn ext-c [oc c]
+  (if (any:lvar? (oc->rands oc))
+    (cons oc c)
+    c))
+
 (defn normalize-store [p]
-  (fn [a]
-    (let [[s d c] a]
-      (loop [c c, c' ()]
-        (cond
-         (empty? c)               (let [c'' (ext-c (build-oc !=c-NEQ p) c')]
-                                    (make-a s d c''))
+  (fn [[s d c :as a]]
+    (loop [c c, c' ()]
+      (cond
+       (empty? c)               (let [c'' (ext-c (build-oc !=c-NEQ p) c')]
+                                  (make-a s d c''))
 
-         (= (oc->rator (first c))
-            '!=c-NEQ)             (let [oc (first c)
-                                        p' (oc->prefix oc)]
-                                    (cond
-                                     (subsumes? p' p ) a
-                                     (subsumes? p  p') (recur (rest c) c')
-                                     :else             (recur (rest c) (cons oc c'))))
+       (= (oc->rator (first c))
+          '!=c-NEQ)             (let [oc (first c)
+                                      p' (oc->prefix oc)]
+                                  (cond
+                                   (subsumes? p' p ) a
+                                   (subsumes? p  p') (recur (rest c) c')
+                                   :else             (recur (rest c) (cons oc c'))))
 
-         :else                    (recur (rest c) (cons (first c) c')))))))
+          :else                 (recur (rest c) (cons (first c) c'))))))
 
 (def reify-s mu/reify-s)
 
@@ -206,12 +190,11 @@
   (map reify-state:1st-var a*))
 
 (defn rem:run [oc]
-  (fn [a]
-    (let [[s d c] a]
-      (if (some #(= oc %) c)
-        (let [c' (remove #(= oc %) c)]
-          ((oc->proc oc) (make-a s d c')))
-        a))))
+  (fn [[s d c :as a]]
+    (if (some #(= oc %) c)
+      (let [c' (remove #(= oc %) c)]
+        ((oc->proc oc) (make-a s d c')))
+      a)))
 
 (defn run-constraints [x* c]
   (cond
@@ -229,9 +212,8 @@
 (defn enforce-constraints-NEQ [x] unit)
 
 (defn reify-constraints-NEQ [m r]
-  (fn [a]
-    (let [[s d c] a
-          c' (walk* c r)
+  (fn [[s d c :as a]]
+    (let [c' (walk* c r)
           p* (remove any:lvar? (map oc->prefix c'))]
       (if (empty? p*)
         m
@@ -240,6 +222,18 @@
 (def process-prefix process-prefix-NEQ)
 (def enforce-constraints enforce-constraints-NEQ)
 (def reify-constraints reify-constraints-NEQ)
+
+(defn goal-construct [f]
+  (fn [[a c]]
+    (if-let [a' (f a)]
+      (unit [a' c])
+      mzero)))
+
+(defn == [u v]
+  (goal-construct (==c u v)))
+
+(defn != [u v]
+  (goal-construct (!=c u v)))
 
 (defmacro conde
   [& clauses]
