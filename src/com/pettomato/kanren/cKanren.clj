@@ -63,29 +63,27 @@
   (let [v (mu/walk v s)]
     (cond
      (mu/lvar? v) (mu/lvar=? v x)
-     (pair? v) (or (occurs-check x (first v) s)
-                   (recur x (rest v) s))
+     (pair? v) (some #(occurs-check x % s) v)
      :else false)))
 
-(defn unify [e s]
+(defn unify
+  [e s]
   (if (empty? e)
     s
-    (loop [u (first (first e))
-           v (second (first e))
-           e (rest e)]
-      (let [u (mu/walk u s)
-            v (mu/walk v s)]
-        (cond
-         (= u v) (unify e s)
-         (mu/lvar? u)
-         (and (not (occurs-check u v s))
-              (unify e (mu/ext-s u v s)))
-         (mu/lvar? v)
-         (and (not (occurs-check v u s))
-              (unify e (mu/ext-s v u s)))
-         (and (pair? u) (pair? v))
-         (recur (first u) (first v) (cons (list (rest u) (rest v)) e))
-         :else false)))))
+    (let [[[u v] & e] e
+          u (mu/walk u s)
+          v (mu/walk v s)]
+      (cond
+       (= u v)         (recur e s)
+       (mu/lvar? u)    (and (not (occurs-check u v s))
+                            (recur e (mu/ext-s u v s)))
+       (mu/lvar? v)    (and (not (occurs-check v u s))
+                            (recur e (mu/ext-s v u s)))
+       (and (pair? u)
+            (pair? v)) (let [[u1 & us] u
+                             [v1 & vs] v]
+                         (recur (list* [u1 v1] [us vs] e) s))
+            :else           false))))
 
 (defn subsumes? [p s]
   (if-let [s' (unify p s)]
