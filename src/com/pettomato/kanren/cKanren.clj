@@ -194,13 +194,14 @@
 
 (defn run-constraints [x* c]
   (cond
-   (empty? c)                 identity-M
+   (empty? c)             identity-M
 
    (any-relevant:lvar?
-    (oc->rands (first c)) x*) (compose-M (rem:run (first c))
-                                         (run-constraints x* (rest c)))
+    (oc->rands (first c))
+    x*)                   (compose-M (rem:run (first c))
+                                     (run-constraints x* (rest c)))
 
-   :else                      (run-constraints x* (rest c))))
+   :else                  (run-constraints x* (rest c))))
 
 (defn process-prefix-NEQ [p c]
   (run-constraints (recover:lvars p) c))
