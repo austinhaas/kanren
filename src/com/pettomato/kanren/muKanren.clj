@@ -1,6 +1,8 @@
 (ns com.pettomato.kanren.muKanren
   (:refer-clojure :exclude [== conj disj]))
 
+(defn pair? [x] (and (coll? x) (not (empty? x))))
+
 (defn lvar [c] [:lvar c])
 
 (defn lvar? [x] (and (vector? x) (= (first x) :lvar)))
@@ -30,7 +32,7 @@
      (and (lvar? u) (lvar? v) (lvar=? u v)) s
      (lvar? u) (ext-s u v s)
      (lvar? v) (ext-s v u s)
-     (and (coll? u) (coll? v))
+     (and (pair? u) (pair? v))
      (let [s (unify (first u) (first v) s)]
        (and s (unify (next u) (next v) s)))
      :else (and (= u v) s))))
@@ -51,7 +53,7 @@
      (cond
       (false? a#) ~e0
       (fn? a#) (let [~f' a#] ~e1)
-      (not (and (coll? a#)
+      (not (and (pair? a#)
                 (fn? (second a#))))
       (let [~a' a#]
         ~e2)
@@ -120,7 +122,7 @@
     (cond
      (lvar? v) (let [n (reify-name (count s))]
                  (ext-s v n s))
-     (and (coll? v) (not (empty? v)))
+     (pair? v)
      (reify-s (rest v) (reify-s (first v) s))
      :else s)))
 
@@ -128,8 +130,8 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) v
-     (and (list? v) (not (empty? v))) (map #(walk* % s) v)
-     (and (coll? v) (not (empty? v))) (into (empty v) (map #(walk* % s) v))
+     (and (pair? v) (list? v)) (map #(walk* % s) v)
+     (pair? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
 (defn reify-state:1st-var [[s c]]

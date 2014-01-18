@@ -3,7 +3,7 @@
   (:require
    [com.pettomato.kanren.muKanren :as mu]))
 
-(defn pair? [x] (and (coll? x) (not (empty? x))))
+(def pair? mu/pair?)
 
 (def unit mu/unit)
 (def mzero mu/mzero)
