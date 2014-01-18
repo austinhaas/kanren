@@ -73,6 +73,13 @@
    :else     false))
 
 (defn any-relevant:lvar? [t x*]
+  ;; The 'first' call is a hack because we are assuming that t is a
+  ;; sequence with one item that is a map: the substitution "prefix"
+  ;; at the time the constraint was added. The original implementation
+  ;; assumed everything is based on conses, but we broke that by
+  ;; implementing substitutions as maps. If other constraint systems
+  ;; are added, this will have to be fixed, because those may require
+  ;; examining more than the first item in t.
   (->> t
        first ;; hack
        seq
