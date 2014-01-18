@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.llist :refer (empty-llist lcons llist*)]
-   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run)]))
+   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run walk*)]))
 
 (defn emptyo [l]
   (== l empty-llist))
@@ -34,3 +34,15 @@
        (conso head tail l)
        (!= x head)
        (nonmembero x tail))]))
+
+(defn trace-lvar [msg v]
+  (fn [a]
+    (let [[[s d c] counter] a]
+      (println msg (walk* v s)))
+    a))
+
+(defn trace-s [msg]
+  (fn [a]
+    (let [[[s d c] counter] a]
+      (println msg s))
+    a))
