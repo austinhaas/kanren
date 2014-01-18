@@ -8,11 +8,14 @@
 (defn lvar=? [x1 x2] (= (second x1) (second x2)))
 
 (defn walk [u s]
-  (if-let [x (and (lvar? u) (some #(when (lvar=? (first %) u) %) s))]
-    (recur (second x) s)
-    u))
+  (let [x (get s u ::not-found)]
+    (if (= x ::not-found)
+      u
+      (recur x s))))
 
-(defn ext-s [x v s] (cons [x v] s))
+(def empty-s {})
+
+(defn ext-s [x v s] (assoc s x v))
 
 (def mzero false)
 
@@ -128,8 +131,6 @@
      (and (list? v) (not (empty? v))) (map #(walk* % s) v)
      (and (coll? v) (not (empty? v))) (into (empty v) (map #(walk* % s) v))
      :else v)))
-
-(def empty-s ())
 
 (defn reify-state:1st-var [[s c]]
   (let [v (walk* (lvar 0) s)]

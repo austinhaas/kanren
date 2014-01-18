@@ -32,23 +32,25 @@
      (pair? v) (some #(occurs-check x % s) v)
      :else     false)))
 
-(defn unify [e s]
-  (if (empty? e)
-    s
-    (let [[[u v] & e] e
-          u (walk u s)
-          v (walk v s)]
-      (cond
-       (= u v)         (recur e s)
-       (lvar? u)       (and (not (occurs-check u v s))
-                            (recur e (ext-s u v s)))
-       (lvar? v)       (and (not (occurs-check v u s))
-                            (recur e (ext-s v u s)))
-       (and (pair? u)
-            (pair? v)) (let [[u1 & us] u
-                             [v1 & vs] v]
-                         (recur (list* [u1 v1] [us vs] e) s))
-            :else      false))))
+(defn unify:prefix
+  ([e s] (unify:prefix e s empty-s))
+  ([e s p]
+     (if (empty? e)
+       [s p]
+       (let [[[u v] & e] e
+             u (walk u s)
+             v (walk v s)]
+         (cond
+          (= u v)         (recur e s p)
+          (lvar? u)       (and (not (occurs-check u v s))
+                               (recur e (ext-s u v s) (ext-s u v p)))
+          (lvar? v)       (and (not (occurs-check v u s))
+                               (recur e (ext-s v u s) (ext-s v u p)))
+          (and (pair? u)
+               (pair? v)) (let [[u1 & us] u
+                                [v1 & vs] v]
+                            (recur (list* [u1 v1] [us vs] e) s p))
+               :else      false)))))
 
 (def identity-M identity)
 
@@ -71,49 +73,37 @@
    :else     false))
 
 (defn any-relevant:lvar? [t x*]
-  (cond
-   (lvar? t) (some #(= t %) x*)
-   (pair? t) (some #(any-relevant:lvar? % x*) t)
-   :else     false))
-
-(defn ext:lvars [x r]
-  (if (some #(= x %) r)
-    r
-    (cons x r)))
+  (->> t
+       first ;; hack
+       seq
+       (apply concat)
+       (filter lvar?)
+       (filter x*)
+       empty?
+       not))
 
 (defn recover:lvars [p]
-  (if (empty? p)
-    ()
-    (let [[[x v] & ps] p
-          r (recover:lvars ps)]
-      (if (lvar? v)
-        (ext:lvars v (ext:lvars x r))
-        (ext:lvars x r)))))
-
-(defn prefix-s [s s']
-  (if (empty? s)
-    s'
-    (loop [s' s'
-           acc ()]
-      (if (= s' s)
-        (reverse acc)
-        (recur (rest s') (cons (first s') acc))))))
+  (reduce (fn [r [x v]]
+            (if (lvar? v)
+              (conj r x v)
+              (conj r x)))
+          #{}
+          p))
 
 (defn ==c [u v]
   (fn [[s d c :as a]]
-    (if-let [s' (unify (list [u v]) s)]
-      (if (= s s')
-        a
-        (let [p  (prefix-s s s')
-              a' (make-a s' d c)]
-          ((process-prefix p c) a')))
+    (if-let [sp (unify:prefix (list [u v]) s)]
+      (let [[s' p] sp]
+        (if (empty? p)
+          a
+          (let [a' (make-a s' d c)]
+            ((process-prefix p c) a'))))
       false)))
 
 (defmacro build-aux-oc [op args zs args2]
   (if (empty? args)
-    (let [op1 op]
-      `(let [~@(interleave zs args)]
-         (list (~op ~@zs) ~op1 ~@zs)))
+    `(let [~@(interleave zs args)]
+       (list (~op ~@zs) (var ~op) ~@zs))
     `(build-aux-oc ~op ~(rest args) ~(cons (first args) zs) ~args)))
 
 (defmacro build-oc [op & args]
@@ -126,8 +116,8 @@
 
 (defn !=c-NEQ [p]
   (fn [[s d c :as a]]
-    (if-let [s' (unify p s)]
-      (let [p' (prefix-s s s')]
+    (if-let [sp (unify:prefix (seq p) s)]
+      (let [[s' p'] sp]
         (if (empty? p')
           false
           ((normalize-store p') a)))
@@ -135,13 +125,15 @@
 
 (defn !=c [u v]
   (fn [[s d c :as a]]
-    (if-let [s' (unify (list [u v]) s)]
-      ((!=c-NEQ (prefix-s s s')) a)
+    (if-let [sp (unify:prefix (list [u v]) s)]
+      (let [[s' p] sp]
+        ((!=c-NEQ p) a))
       a)))
 
 (defn subsumes? [p s]
-  (if-let [s' (unify p s)]
-    (= s s')
+  (if-let [sp (unify:prefix (seq p) s)]
+    (let [[s' p'] sp]
+      (= s s'))
     false))
 
 (defn ext-c [oc c]
@@ -157,14 +149,14 @@
                                   (make-a s d c''))
 
        (= (oc->rator (first c))
-          '!=c-NEQ)             (let [oc (first c)
+          (var !=c-NEQ))        (let [oc (first c)
                                       p' (oc->prefix oc)]
                                   (cond
                                    (subsumes? p' p ) a
                                    (subsumes? p  p') (recur (rest c) c')
                                    :else             (recur (rest c) (cons oc c'))))
 
-          :else                 (recur (rest c) (cons (first c) c'))))))
+       :else                    (recur (rest c) (cons (first c) c'))))))
 
 (def reify-s mu/reify-s)
 
@@ -201,7 +193,7 @@
     x*)                   (compose-M (rem:run (first c))
                                      (run-constraints x* (rest c)))
 
-   :else                  (run-constraints x* (rest c))))
+    :else                  (run-constraints x* (rest c))))
 
 (defn process-prefix-NEQ [p c]
   (run-constraints (recover:lvars p) c))
@@ -210,8 +202,10 @@
 
 (defn reify-constraints-NEQ [m r]
   (fn [[s d c :as a]]
-    (let [c' (walk* c r)
-          p* (remove any:lvar? (map oc->prefix c'))]
+    (let [p* (remove any:lvar?
+                     (walk*
+                      (map seq (map oc->prefix c))
+                      r))]
       (if (empty? p*)
         m
         `(~m :- (~'!= ~@p*))))))
