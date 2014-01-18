@@ -44,8 +44,8 @@
       mzero)))
 
 (defn call:fresh [f]
-  (fn [[s c]]
-    ((f (lvar c)) [s (inc c)])))
+  (fn [{:keys [i] :as pkg}]
+    ((f (lvar i)) (update-in pkg [:i] inc))))
 
 (defmacro case-inf
   [e _ e0 [f'] e1 [a'] e2 [a f] e3]
@@ -122,8 +122,7 @@
     (cond
      (lvar? v) (let [n (reify-name (count s))]
                  (ext-s v n s))
-     (pair? v)
-     (reify-s (rest v) (reify-s (first v) s))
+     (pair? v) (reify-s (rest v) (reify-s (first v) s))
      :else s)))
 
 (defn walk* [v s]
@@ -134,19 +133,21 @@
      (pair? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
-(defn reify-state:1st-var [[s c]]
+(defn reify-state:1st-var [{:keys [s]}]
   (let [v (walk* (lvar 0) s)]
     (walk* v (reify-s v empty-s))))
 
 (defn mK-reify [a*]
   (map reify-state:1st-var a*))
 
-(def empty-state [empty-s 0])
+(def empty-pkg
+  {:i 0
+   :s empty-s})
 
-(defn call:empty-state [g] (g empty-state))
+(defn call:empty-pkg [g] (g empty-pkg))
 
 (defmacro run* [[& vars] & gs]
-  `(mK-reify (take* (call:empty-state
+  `(mK-reify (take* (call:empty-pkg
                      (fresh [~@vars]
                        ~@gs)))))
 

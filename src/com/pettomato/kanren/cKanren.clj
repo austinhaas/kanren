@@ -15,12 +15,18 @@
 (def ext-s mu/ext-s)
 
 (def empty-s mu/empty-s)
-(def empty-d ())
 (def empty-c ())
 
-(defn make-a [s d c] [s d c])
+(declare any:lvar? oc->rands)
 
-(def empty-a (make-a empty-s empty-d empty-c))
+(defn ext-c [oc c]
+  (if (any:lvar? (oc->rands oc))
+    (cons oc c)
+    c))
+
+(def empty-pkg
+  (assoc mu/empty-pkg
+    :c empty-c))
 
 (def walk mu/walk)
 (def walk* mu/walk*)
@@ -98,13 +104,13 @@
           p))
 
 (defn ==c [u v]
-  (fn [[s d c :as a]]
+  (fn [{:keys [s c] :as pkg}]
     (if-let [sp (unify:prefix (list [u v]) s)]
       (let [[s' p] sp]
         (if (empty? p)
-          a
-          (let [a' (make-a s' d c)]
-            ((process-prefix p c) a'))))
+          pkg
+          (let [pkg' (assoc pkg :s s')]
+            ((process-prefix p c) pkg'))))
       false)))
 
 (defmacro build-aux-oc [op args zs args2]
@@ -122,20 +128,20 @@
 (declare normalize-store)
 
 (defn !=c-NEQ [p]
-  (fn [[s d c :as a]]
+  (fn [{:keys [s] :as pkg}]
     (if-let [sp (unify:prefix (seq p) s)]
       (let [[s' p'] sp]
         (if (empty? p')
           false
-          ((normalize-store p') a)))
-      a)))
+          ((normalize-store p') pkg)))
+      pkg)))
 
 (defn !=c [u v]
-  (fn [[s d c :as a]]
+  (fn [{:keys [s] :as pkg}]
     (if-let [sp (unify:prefix (list [u v]) s)]
       (let [[s' p] sp]
-        ((!=c-NEQ p) a))
-      a)))
+        ((!=c-NEQ p) pkg))
+      pkg)))
 
 (defn subsumes? [p s]
   (if-let [sp (unify:prefix (seq p) s)]
@@ -143,23 +149,18 @@
       (= s s'))
     false))
 
-(defn ext-c [oc c]
-  (if (any:lvar? (oc->rands oc))
-    (cons oc c)
-    c))
-
 (defn normalize-store [p]
-  (fn [[s d c :as a]]
+  (fn [{:keys [c] :as pkg}]
     (loop [c c, c' ()]
       (cond
        (empty? c)               (let [c'' (ext-c (build-oc !=c-NEQ p) c')]
-                                  (make-a s d c''))
+                                  (assoc pkg :c c''))
 
        (= (oc->rator (first c))
           (var !=c-NEQ))        (let [oc (first c)
                                       p' (oc->prefix oc)]
                                   (cond
-                                   (subsumes? p' p ) a
+                                   (subsumes? p' p ) pkg
                                    (subsumes? p  p') (recur (rest c) c')
                                    :else             (recur (rest c) (cons oc c'))))
 
@@ -167,10 +168,9 @@
 
 (def reify-s mu/reify-s)
 
-(defn reify-state:1st-var [[a c]]
-  (let [[s d c] a
-        x (lvar 0)]
-    (if-let [a ((enforce-constraints x) a)]
+(defn reify-state:1st-var [{:keys [s c] :as pkg}]
+  (let [x (lvar 0)]
+    (if-let [a ((enforce-constraints x) pkg)]
       (let [v (walk* x s)
             r (reify-s v empty-s)]
         (if (empty? r)
@@ -178,18 +178,18 @@
           (let [v' (walk* v r)]
             (if (empty? c)
               v'
-              ((reify-constraints v' r) a)))))
+              ((reify-constraints v' r) pkg)))))
       false)))
 
 (defn cK-reify [a*]
   (map reify-state:1st-var a*))
 
 (defn rem:run [oc]
-  (fn [[s d c :as a]]
+  (fn [{:keys [s d c] :as pkg}]
     (if (some #(= oc %) c)
       (let [c' (remove #(= oc %) c)]
-        ((oc->proc oc) (make-a s d c')))
-      a)))
+        ((oc->proc oc) (assoc pkg :c c')))
+      pkg)))
 
 (defn run-constraints [x* c]
   (cond
@@ -208,7 +208,7 @@
 (defn enforce-constraints-NEQ [x] unit)
 
 (defn reify-constraints-NEQ [m r]
-  (fn [[s d c :as a]]
+  (fn [{:keys [c] :as pkg}]
     (let [p* (remove any:lvar?
                      (walk*
                       (map seq (map oc->prefix c))
@@ -222,16 +222,14 @@
 (def reify-constraints reify-constraints-NEQ)
 
 (defn goal-construct [f]
-  (fn [[a c]]
-    (if-let [a' (f a)]
-      (unit [a' c])
+  (fn [pkg]
+    (if-let [pkg' (f pkg)]
+      (unit pkg')
       mzero)))
 
-(defn == [u v]
-  (goal-construct (==c u v)))
+(defn == [u v] (goal-construct (==c u v)))
 
-(defn != [u v]
-  (goal-construct (!=c u v)))
+(defn != [u v] (goal-construct (!=c u v)))
 
 (defmacro conde
   [& clauses]
@@ -243,12 +241,10 @@
   [[& vars] & gs]
   `(mu/fresh [~@vars] ~@gs))
 
-(def empty-state [empty-a 0])
-
-(defn call:empty-state [g] (g empty-state))
+(defn call:empty-pkg [g] (g empty-pkg))
 
 (defmacro run* [[& vars] & gs]
-  `(cK-reify (take* (call:empty-state
+  `(cK-reify (take* (call:empty-pkg
                      (fresh [~@vars]
                        ~@gs)))))
 
