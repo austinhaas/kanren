@@ -74,9 +74,7 @@
 
 (defmacro Zzz [g]
   `(fn [a#]
-     (set-rank
-      (fn [] (~g a#))
-      (get-rank a#))))
+     (fn [] (~g a#))))
 
 (defmacro conj+
   ([g] `(Zzz ~g))
