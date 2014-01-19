@@ -16,9 +16,9 @@
   (vary-meta a-inf assoc ::rank r))
 
 (defn inc-rank [a-inf]
-  (if (contains? (meta a-inf) ::rank)
-    (vary-meta a-inf update-in [::rank] inc)
-    a-inf))
+  (and a-inf
+       (let [r (get-rank a-inf)]
+         (vary-meta a-inf assoc ::rank (inc r)))))
 
 (defn add-rank [a-inf r]
   (vary-meta a-inf update-in [::rank] + r))
@@ -46,16 +46,18 @@
                                  f'-rank)
                        (set-rank (fn [] (mplus (f)  f'))
                                  f-rank)))
-            [a]    (choice a f)
-            [a f'] (choice
-                    a
-                    (let [f'-rank (get-rank f')
-                          f-rank  (get-rank f)]
-                      (if (< f'-rank f-rank)
-                        (set-rank (fn [] (mplus (f') f))
-                                  f'-rank)
-                        (set-rank (fn [] (mplus (f)  f'))
-                                  f-rank))))))
+            [a]    (set-rank (choice a f)
+                             (min (get-rank a) (get-rank f)))
+            [a f'] (let [f'' (let [f'-rank (get-rank f')
+                                   f-rank  (get-rank f)]
+                               (if (< f'-rank f-rank)
+                                 (set-rank (fn [] (mplus (f') f))
+                                           f'-rank)
+                                 (set-rank (fn [] (mplus (f)  f'))
+                                           f-rank)))]
+                     (set-rank
+                      (choice a f'')
+                      (min (get-rank a) (get-rank f''))))))
 
 (defn bind [a-inf g]
   (case-inf a-inf
@@ -66,23 +68,9 @@
             [a f] (mplus (g a) (set-rank (fn [] (bind (f) g))
                                          (get-rank f)))))
 
-(defn disj [g1 g2]
-  (fn [a]
-    (let [a' (inc-rank a)
-          x1 (g1 a')
-          x2 (g2 a')
-          r1 (get-rank x1)
-          r2 (get-rank x2)]
-      (set-rank
-       (mplus x1 x2)
-       (min r1 r2)))))
+(defn disj [g1 g2] (fn [a] (mplus (g1 a) (g2 a))))
 
-(defn conj [g1 g2]
-  (fn [a]
-    (let [x (g1 a)]
-      (set-rank
-       (bind x g2)
-       (get-rank x)))))
+(defn conj [g1 g2] (fn [a] (bind (g1 a) g2)))
 
 (defmacro Zzz [g]
   `(fn [a#]
@@ -136,4 +124,3 @@
 
 (def == c/==)
 (def != c/!=)
-
