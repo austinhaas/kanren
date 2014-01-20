@@ -46,18 +46,15 @@
                                  f'-rank)
                        (set-rank (fn [] (mplus (f)  f'))
                                  f-rank)))
-            [a]    (set-rank (choice a f)
-                             (min (get-rank a) (get-rank f)))
-            [a f'] (let [f'' (let [f'-rank (get-rank f')
-                                   f-rank  (get-rank f)]
-                               (if (< f'-rank f-rank)
-                                 (set-rank (fn [] (mplus (f') f))
-                                           f'-rank)
-                                 (set-rank (fn [] (mplus (f)  f'))
-                                           f-rank)))]
-                     (set-rank
-                      (choice a f'')
-                      (min (get-rank a) (get-rank f''))))))
+            [a]    (choice a f)
+            [a f'] (choice a
+                           (let [f'-rank (get-rank f')
+                                 f-rank  (get-rank f)]
+                             (if (< f'-rank f-rank)
+                               (set-rank (fn [] (mplus (f') f))
+                                         f'-rank)
+                               (set-rank (fn [] (mplus (f)  f'))
+                                         f-rank))))))
 
 (defn bind [a-inf g]
   (case-inf a-inf
@@ -74,17 +71,19 @@
 
 (defmacro Zzz [g]
   `(fn [a#]
-     (fn [] (~g a#))))
-
-(defmacro conj+
-  ([g] `(Zzz ~g))
-  ([g & gs]
-     `(conj (Zzz ~g) (conj+ ~@gs))))
+     (set-rank
+      (fn [] (~g a#))
+      (get-rank a#))))
 
 (defmacro disj+
   ([g] `(Zzz ~g))
   ([g & gs]
      `(disj (Zzz ~g) (disj+ ~@gs))))
+
+(defmacro conj+
+  ([g] `(Zzz ~g))
+  ([g & gs]
+     `(conj (Zzz ~g) (conj+ ~@gs))))
 
 (defmacro conde
   [& clauses]
