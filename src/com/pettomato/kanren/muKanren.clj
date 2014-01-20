@@ -43,10 +43,6 @@
       (unit [s' c])
       mzero)))
 
-(defn call:fresh [f]
-  (fn [{:keys [i] :as pkg}]
-    ((f (lvar i)) (update-in pkg [:i] inc))))
-
 (defmacro case-inf
   [e _ e0 [f'] e1 [a'] e2 [a f] e3]
   `(let [a# ~e]
@@ -100,6 +96,10 @@
   `(disj+
     ~@(for [c clauses]
         `(conj+ ~@c))))
+
+(defn call:fresh [f]
+  (fn [{:keys [i] :as pkg}]
+    ((f (lvar i)) (update-in pkg [:i] inc))))
 
 (defmacro fresh
   [[& vars] & gs]
