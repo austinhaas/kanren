@@ -5,9 +5,9 @@ languages, in Clojure.
 
 These are my personal, work-in-progress adaptations. I've tried to
 keep them simple, and consistent with the source papers, but I've made
-changes to suit Clojure, personal style, and for runtime
+changes to suit Clojure, for personal style, and for runtime
 efficiency. I'm also building the cKanren and rKanren code on µKanren,
-so those implementations differ from than the originals.
+so those implementations differ from the originals.
 
 The cKanren implementation only contains disequality constraints.
 
@@ -27,21 +27,10 @@ See `src/com/pettomato/kanren/demo.clj`.
 
 ## Reference
 
-### miniKanren
-
-https://scholarworks.iu.edu/dspace/bitstream/handle/2022/8777/Byrd_indiana_0093A_10344.pdf
-
-### µKanren
-
-http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf
-
-### cKanren
-
-http://www.schemeworkshop.org/2011/papers/Alvis2011.pdf
-
-### rKanren
-
-http://cswords.com/paper/rkanren.pdf
+* miniKanren: https://mitpress.mit.edu/books/reasoned-schemer, https://scholarworks.iu.edu/dspace/bitstream/handle/2022/8777/Byrd_indiana_0093A_10344.pdf
+* µKanren: http://webyrd.net/scheme-2013/papers/HemannMuKanren2013.pdf
+* cKanren: http://www.schemeworkshop.org/2011/papers/Alvis2011.pdf
+* rKanren: http://cswords.com/paper/rkanren.pdf
 
 ## License
 
