@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.llist :refer (empty-llist lcons llist*)]
-   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run walk*)]))
+   [com.pettomato.kanren.muKanren :as mu]
+   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run run* unit)]))
 
 (defn emptyo [l]
   (== l empty-llist))
@@ -36,13 +37,31 @@
        (nonmembero x tail))]))
 
 (defn trace-lvar [msg v]
-  (fn [a]
-    (let [[[s d c] counter] a]
-      (println msg (walk* v s)))
-    a))
+  (fn [{:keys [s] :as pkg}]
+    (println msg (mu/reify-var v s))
+    (unit pkg)))
+
+(defn trace-pkg [msg]
+  (fn [pkg]
+    (println msg pkg)
+    (unit pkg)))
 
 (defn trace-s [msg]
-  (fn [a]
-    (let [[[s d c] counter] a]
-      (println msg s))
-    a))
+  (fn [{:keys [s] :as pkg}]
+    (println msg s)
+    (unit pkg)))
+
+(defn log [msg]
+  (fn [{:keys [s] :as pkg}]
+    (println msg)
+    (unit pkg)))
+
+(defn succeed [a]
+  (unit a))
+
+(defn anyo [g]
+  (conde
+    [g succeed]
+    [(anyo g)]))
+
+(def alwayso (anyo succeed))
