@@ -38,9 +38,9 @@
      :else (and (= u v) s))))
 
 (defn == [u v]
-  (fn [[s c]]
+  (fn [{:keys [s] :as pkg}]
     (if-let [s' (unify u v s)]
-      (unit [s' c])
+      (unit (assoc pkg :s s'))
       mzero)))
 
 (defmacro case-inf
