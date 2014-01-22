@@ -1,10 +1,14 @@
-(ns com.pettomato.kanren.cKanren
+(ns com.pettomato.kanren.cKanren.cKanren
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.muKanren :as mu]))
+   [com.pettomato.kanren.muKanren.muKanren :as mu]))
 
 (def unit mu/unit)
 (def mzero mu/mzero)
+(def choice mu/choice)
+
+(def unit? mu/unit?)
+(def mzero? mu/mzero?)
 
 (def lvar mu/lvar)
 (def lvar? mu/lvar?)
@@ -162,7 +166,7 @@
                                    (subsumes? p  p') (recur (rest c) c')
                                    :else             (recur (rest c) (cons oc c'))))
 
-       :else                    (recur (rest c) (cons (first c) c'))))))
+          :else                    (recur (rest c) (cons (first c) c'))))))
 
 (def reify-s mu/reify-s)
 
@@ -242,11 +246,11 @@
 (defmacro conde
   [& clauses]
   (let [a (gensym)]
-   `(fn [~a]
-      (delay
-       (mplus*
-        ~@(for [[g & gs] clauses]
-            `(bind* (~g ~a) ~@gs)))))))
+    `(fn [~a]
+       (delay
+        (mplus*
+         ~@(for [[g & gs] clauses]
+             `(bind* (~g ~a) ~@gs)))))))
 
 (defmacro fresh
   [[& vars] g & gs]

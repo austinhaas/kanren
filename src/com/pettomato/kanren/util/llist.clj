@@ -1,4 +1,4 @@
-(ns com.pettomato.kanren.llist)
+(ns com.pettomato.kanren.util.llist)
 
 (def empty-llist nil)
 

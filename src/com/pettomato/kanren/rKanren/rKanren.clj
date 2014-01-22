@@ -1,16 +1,15 @@
-(ns com.pettomato.kanren.rKanren
-  (:refer-clojure :exclude [== conj disj])
+(ns com.pettomato.kanren.rKanren.rKanren
+  (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.muKanren :as mu]
-   [com.pettomato.kanren.cKanren :as c]))
+   [com.pettomato.kanren.cKanren.cKanren :as c]))
 
-(def lvar mu/lvar)
+(def lvar c/lvar)
 
-(def unit mu/unit)
-(def mzero mu/mzero)
-(def choice mu/choice)
-(def mzero? mu/mzero?)
-(def unit? mu/unit?)
+(def unit c/unit)
+(def mzero c/mzero)
+(def choice c/choice)
+(def mzero? c/mzero?)
+(def unit? c/unit?)
 
 (defn get-rank [a-inf]
   (get (meta a-inf) ::rank -1))
@@ -34,7 +33,7 @@
 (defn rdelay? [d] (fn? d))
 
 (defn rforce [d]
-  (assert (rdelay? d))
+  (assert (rdelay? d) (str d))
   (d))
 
 (defmacro case-inf
@@ -48,7 +47,7 @@
 
 (defn mplus [a-inf f]
   (case-inf a-inf
-            []     (rforce f)
+            []     f
             [f']   (let [f'-rank (get-rank f')
                          f-rank (get-rank f)]
                      (if (< f'-rank f-rank)
@@ -68,10 +67,6 @@
             [f]    (rdelay (get-rank f) (bind (rforce f) g))
             [a]    (g a)
             [a f]  (mplus (g a) (rdelay (get-rank f) (bind f g)))))
-
-(defn foo
-  ([x] 1)
-  ([x & xs] 2))
 
 (defmacro mplus*
   ([e] e)

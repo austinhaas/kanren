@@ -1,8 +1,8 @@
-(ns com.pettomato.kanren.cKanren-goals
+(ns com.pettomato.kanren.muKanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.llist :refer (empty-llist lcons)]
-   [com.pettomato.kanren.cKanren :refer (== != fresh conde unit mzero reify-var)]))
+   [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.muKanren.muKanren :refer (== fresh conde unit mzero reify-var)]))
 
 (defn succeed [a] (unit a))
 
@@ -19,17 +19,7 @@
     (conso head tail l)
     (conde
       [(== x head)]
-      [(!= x head) (membero x tail)])))
-
-(defn nonmembero
-  "A relation where l is a collection, such that l does not contain x."
-  [x l]
-  (conde
-    [(emptyo l)]
-    [(fresh [head tail]
-       (conso head tail l)
-       (!= x head)
-       (nonmembero x tail))]))
+      [(membero x tail)])))
 
 (defn appendo [x y z]
   (conde

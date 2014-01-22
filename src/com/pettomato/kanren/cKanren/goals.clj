@@ -1,8 +1,8 @@
-(ns com.pettomato.kanren.rKanren-goals
+(ns com.pettomato.kanren.cKanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.llist :refer (empty-llist lcons)]
-   [com.pettomato.kanren.rKanren :refer (== != fresh conde unit mzero reify-var)]))
+   [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.cKanren.cKanren :refer (== != fresh conde unit mzero reify-var)]))
 
 (defn succeed [a] (unit a))
 

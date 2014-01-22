@@ -1,4 +1,4 @@
-(ns com.pettomato.kanren.muKanren
+(ns com.pettomato.kanren.muKanren.muKanren
   (:refer-clojure :exclude [== conj disj]))
 
 (defn lvar [c] [:lvar c])
