@@ -3,8 +3,6 @@
   (:require
    [com.pettomato.kanren.muKanren :as mu]))
 
-(def pair? mu/pair?)
-
 (def unit mu/unit)
 (def mzero mu/mzero)
 
@@ -35,7 +33,7 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) (lvar=? v x)
-     (pair? v) (some #(occurs-check x % s) v)
+     (coll? v) (some #(occurs-check x % s) v)
      :else     false)))
 
 (defn unify:prefix
@@ -52,8 +50,8 @@
                                (recur e (ext-s u v s) (ext-s u v p)))
           (lvar? v)       (and (not (occurs-check v u s))
                                (recur e (ext-s v u s) (ext-s v u p)))
-          (and (pair? u)
-               (pair? v)) (let [[u1 & us] u
+          (and (coll? u)
+               (coll? v)) (let [[u1 & us] u
                                 [v1 & vs] v]
                             (recur (list* [u1 v1] [us vs] e) s p))
                :else      false)))))
@@ -75,7 +73,7 @@
 (defn any:lvar? [t]
   (cond
    (lvar? t) true
-   (pair? t) (some any:lvar? t)
+   (coll? t) (some any:lvar? t)
    :else     false))
 
 (defn any-relevant:lvar? [t x*]
