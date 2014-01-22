@@ -133,9 +133,12 @@
      (pair? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
-(defn reify-state:1st-var [{:keys [s]}]
-  (let [v (walk* (lvar 0) s)]
+(defn reify-var [v s]
+  (let [v (walk* v s)]
     (walk* v (reify-s v empty-s))))
+
+(defn reify-state:1st-var [{:keys [s]}]
+  (reify-var (lvar 0) s))
 
 (defn mK-reify [a*]
   (map reify-state:1st-var a*))
