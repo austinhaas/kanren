@@ -6,8 +6,8 @@
 
 #_(run* [q]
     (condr
-     [2 (== q 'second)]
-     [3 (== q 'third)]
+     [3 (== q 'second)]
+     [5 (== q 'third)]
      [1 (== q 'first)]))
 
 (defn recur-e [e]
