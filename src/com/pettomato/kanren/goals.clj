@@ -56,6 +56,9 @@
     (println msg)
     (unit pkg)))
 
+(defn fail [a]
+  mu/mzero)
+
 (defn succeed [a]
   (unit a))
 
