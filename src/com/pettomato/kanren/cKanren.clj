@@ -231,15 +231,37 @@
 
 (defn != [u v] (goal-construct (!=c u v)))
 
+(defmacro mplus*
+  ([e] e)
+  ([e & es] `(mu/mplus ~e (delay (mplus* ~@es)))))
+
+(defmacro bind*
+  ([e] e)
+  ([e g & gs] `(bind* (mu/bind ~e ~g) ~@gs)))
+
 (defmacro conde
   [& clauses]
-  `(mu/conde ~@clauses))
-
-(def take* mu/take*)
+  (let [a (gensym)]
+   `(fn [~a]
+      (delay
+       (mplus*
+        ~@(for [[g & gs] clauses]
+            `(bind* (~g ~a) ~@gs)))))))
 
 (defmacro fresh
-  [[& vars] & gs]
-  `(mu/fresh [~@vars] ~@gs))
+  [[& vars] g & gs]
+  (let [n (count vars)
+        a (gensym)
+        a' (gensym)
+        c (gensym)]
+    `(fn [~a]
+       (delay
+        (let [~c (:i ~a)
+              ~@(apply concat (map-indexed (fn [i v] `[~v (lvar (+ ~c ~i))]) vars))
+              ~a' (update-in ~a [:i] + ~n)]
+          (bind* (~g ~a') ~@gs))))))
+
+(def take* mu/take*)
 
 (defn call:empty-pkg [g] (g empty-pkg))
 
