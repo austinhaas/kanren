@@ -21,7 +21,11 @@
 
 (def mzero false)
 
+(def mzero? false?)
+
 (defn unit [a] a)
+
+(def unit? map?)
 
 (defn choice [a f] [a f])
 
@@ -47,29 +51,24 @@
   [e _ e0 [f'] e1 [a'] e2 [a f] e3]
   `(let [a# ~e]
      (cond
-      (false? a#) ~e0
-      (fn? a#) (let [~f' a#] ~e1)
-      (not (and (pair? a#)
-                (fn? (second a#))))
-      (let [~a' a#]
-        ~e2)
-      :else (let [~a (first a#)
-                  ~f (second a#)]
-              ~e3))))
+      (mzero? a#) ~e0
+      (delay? a#) (let [~f' a#] ~e1)
+      (unit? a#)  (let [~a' a#] ~e2)
+      :else       (let [[~a ~f] a#] ~e3))))
 
 (defn mplus [a-inf f]
   (case-inf a-inf
-            []     (f)
-            [f']   (fn [] (mplus (f) f'))
+            []     (force f)
+            [f']   (delay (mplus f (force f')))
             [a]    (choice a f)
-            [a f'] (choice a (fn [] (mplus (f) f')))))
+            [a f'] (choice a (delay (mplus f f')))))
 
 (defn bind [a-inf g]
   (case-inf a-inf
             []     mzero
-            [f]    (fn [] (bind (f) g))
+            [f]    (delay (bind (force f) g))
             [a]    (g a)
-            [a f]  (mplus (g a) (fn [] (bind (f) g)))))
+            [a f]  (mplus (g a) (delay (bind f g)))))
 
 (defn disj [g1 g2] (fn [a] (mplus (g1 a) (g2 a))))
 
@@ -79,7 +78,7 @@
 
 (defmacro Zzz [g]
   `(fn [a#]
-     (fn [] (~g a#))))
+     (delay (~g a#))))
 
 (defmacro conj+
   ([g] `(Zzz ~g))
@@ -108,7 +107,7 @@
     `(call:fresh (fn [~(first vars)] (fresh ~(rest vars) ~@gs)))))
 
 (defn take* [f]
-  (case-inf (f)
+  (case-inf (force f)
             []    ()
             [f]   (recur f)
             [a]   (cons a ())
