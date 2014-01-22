@@ -122,10 +122,15 @@
 
 (def reify-var c/reify-var)
 
+(defn pull [x]
+  (if (rdelay? x)
+    (recur (rforce x))
+    x))
+
 (defn take* [f]
   (case-inf f
             []    ()
-            [f]   (take* (f))
+            [f]   (take* (pull f))
             [a]   (cons a ())
             [a f] (cons a (lazy-seq (take* f)))))
 
