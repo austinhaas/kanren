@@ -6,12 +6,9 @@ languages, in Clojure.
 These are my personal, work-in-progress adaptations. I've tried to
 keep them simple, and consistent with the source papers, but I've made
 changes to suit Clojure, for personal style, and for runtime
-efficiency. I'm also building the cKanren and rKanren code on µKanren,
-so those implementations differ from the originals.
+efficiency.
 
 The cKanren implementation only contains disequality constraints.
-
-The rKanren implementation is not finished.
 
 A simple linked list implementation is included, to emulate Scheme's
 improper lists, which are so useful for logic programs. Helper
@@ -23,7 +20,7 @@ sets can be walked, but that's about it.
 
 ## Usage
 
-See `src/com/pettomato/kanren/demo.clj`.
+See the demo.clj files in each implementation subdirectory.
 
 ## Reference
 
