@@ -1,9 +1,12 @@
-(ns com.pettomato.kanren.goals
+(ns com.pettomato.kanren.muKanren-goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.llist :refer (empty-llist lcons llist*)]
-   [com.pettomato.kanren.muKanren :as mu]
-   [com.pettomato.kanren.cKanren :refer (!= == fresh conde run run* unit)]))
+   [com.pettomato.kanren.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.muKanren :refer (== fresh conde unit mzero reify-var)]))
+
+(defn succeed [a] (unit a))
+
+(defn fail [a] mzero)
 
 (defn emptyo [l]
   (== l empty-llist))
@@ -16,7 +19,7 @@
     (conso head tail l)
     (conde
       [(== x head)]
-      [(!= x head) (membero x tail)])))
+      [(membero x tail)])))
 
 (defn appendo [x y z]
   (conde
@@ -26,19 +29,16 @@
        (conso a r z)
        (appendo d y r))]))
 
-(defn nonmembero
-  "A relation where l is a collection, such that l does not contain x."
-  [x l]
+(defn anyo [g]
   (conde
-    [(emptyo l)]
-    [(fresh [head tail]
-       (conso head tail l)
-       (!= x head)
-       (nonmembero x tail))]))
+    [g succeed]
+    [(anyo g)]))
+
+(def alwayso (anyo succeed))
 
 (defn trace-lvar [msg v]
   (fn [{:keys [s] :as pkg}]
-    (println msg (mu/reify-var v s))
+    (println msg (reify-var v s))
     (unit pkg)))
 
 (defn trace-pkg [msg]
@@ -55,16 +55,3 @@
   (fn [{:keys [s] :as pkg}]
     (println msg)
     (unit pkg)))
-
-(defn fail [a]
-  mu/mzero)
-
-(defn succeed [a]
-  (unit a))
-
-(defn anyo [g]
-  (conde
-    [g succeed]
-    [(anyo g)]))
-
-(def alwayso (anyo succeed))

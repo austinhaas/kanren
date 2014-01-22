@@ -166,18 +166,20 @@
 
 (def reify-s mu/reify-s)
 
-(defn reify-state:1st-var [{:keys [s c] :as pkg}]
-  (let [x (lvar 0)]
-    (if-let [a ((enforce-constraints x) pkg)]
-      (let [v (walk* x s)
-            r (reify-s v empty-s)]
-        (if (empty? r)
-          v
-          (let [v' (walk* v r)]
-            (if (empty? c)
-              v'
-              ((reify-constraints v' r) pkg)))))
-      false)))
+(defn reify-var [x {:keys [s c] :as pkg}]
+  (if-let [a ((enforce-constraints x) pkg)]
+    (let [v (walk* x s)
+          r (reify-s v empty-s)]
+      (if (empty? r)
+        v
+        (let [v' (walk* v r)]
+          (if (empty? c)
+            v'
+            ((reify-constraints v' r) pkg)))))
+    false))
+
+(defn reify-state:1st-var [pkg]
+  (reify-var (lvar 0) pkg))
 
 (defn cK-reify [a*]
   (map reify-state:1st-var a*))

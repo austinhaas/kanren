@@ -6,6 +6,7 @@
 
 (def lvar mu/lvar)
 
+(def unit mu/unit)
 (def mzero mu/mzero)
 (def choice mu/choice)
 (def mzero? mu/mzero?)
@@ -123,6 +124,8 @@
               ~@(apply concat (map-indexed (fn [i v] `[~v (lvar (+ ~c ~i))]) vars))
               ~a' (update-in ~a [:i] + ~n)]
           (bind* (~g ~a') ~@gs))))))
+
+(def reify-var c/reify-var)
 
 (defn take* [f]
   (case-inf f
