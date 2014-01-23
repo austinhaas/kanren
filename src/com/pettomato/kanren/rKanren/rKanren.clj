@@ -160,10 +160,11 @@
 
 (def empty-pkg (set-rank c/empty-pkg 0))
 
-(defmacro run* [[& vars] & gs]
-  `(c/cK-reify (take* ((fresh [~@vars]
-                         ~@gs)
-                       empty-pkg))))
+(defmacro run* [[v & vars] g & gs]
+  `(let [~v (lvar)
+         ~@(interleave vars (repeatedly lvar))]
+     (map #(reify-var ~v %)
+          (take* (bind* (~g empty-pkg) ~@gs)))))
 
 (defmacro run [n [& vars] & gs]
   `(take ~n (run* ~vars ~@gs)))
