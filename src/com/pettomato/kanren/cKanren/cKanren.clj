@@ -10,9 +10,9 @@
 (def unit? mu/unit?)
 (def mzero? mu/mzero?)
 
-(def lvar mu/lvar)
+(defn lvar [] [:lvar (. clojure.lang.RT (nextID))])
 (def lvar? mu/lvar?)
-(def lvar=? mu/lvar=?)
+(def lvar=? identical?)
 
 (def ext-s mu/ext-s)
 
@@ -27,8 +27,8 @@
     c))
 
 (def empty-pkg
-  (assoc mu/empty-pkg
-    :c empty-c))
+  {:s empty-s
+   :c empty-c})
 
 (def walk mu/walk)
 (def walk* mu/walk*)
@@ -182,12 +182,6 @@
             ((reify-constraints v' r) pkg)))))
     false))
 
-(defn reify-state:1st-var [pkg]
-  (reify-var (lvar 0) pkg))
-
-(defn cK-reify [a*]
-  (map reify-state:1st-var a*))
-
 (defn rem:run [oc]
   (fn [{:keys [s d c] :as pkg}]
     (if (some #(= oc %) c)
@@ -254,25 +248,18 @@
 
 (defmacro fresh
   [[& vars] g & gs]
-  (let [n (count vars)
-        a (gensym)
-        a' (gensym)
-        c (gensym)]
-    `(fn [~a]
-       (delay
-        (let [~c (:i ~a)
-              ~@(apply concat (map-indexed (fn [i v] `[~v (lvar (+ ~c ~i))]) vars))
-              ~a' (update-in ~a [:i] + ~n)]
-          (bind* (~g ~a') ~@gs))))))
+  `(fn [a#]
+     (delay
+      (let [~@(interleave vars (repeat (list lvar)))]
+        (bind* (~g a#) ~@gs)))))
 
 (def take* mu/take*)
 
-(defn call:empty-pkg [g] (g empty-pkg))
-
-(defmacro run* [[& vars] & gs]
-  `(cK-reify (take* (call:empty-pkg
-                     (fresh [~@vars]
-                       ~@gs)))))
+(defmacro run* [[v & vars] g & gs]
+  `(let [~v (lvar)
+         ~@(interleave vars (repeatedly lvar))]
+     (map #(reify-var ~v %)
+          (take* (bind* (~g empty-pkg) ~@gs)))))
 
 (defmacro run [n [& vars] & gs]
   `(take ~n (run* ~vars ~@gs)))
