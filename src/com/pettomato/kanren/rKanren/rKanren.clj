@@ -137,17 +137,11 @@
 
 (defmacro fresh
   [[& vars] g & gs]
-  (let [n (count vars)
-        a (gensym)
-        a' (gensym)
-        c (gensym)]
-    `(fn [~a]
-       (rdelay
-        (get-rank ~a)
-        (let [~c (:i ~a)
-              ~@(apply concat (map-indexed (fn [i v] `[~v (lvar (+ ~c ~i))]) vars))
-              ~a' (update-in ~a [:i] + ~n)]
-          (bind* (~g ~a') ~@gs))))))
+  `(fn [a#]
+     (rdelay
+      (get-rank a#)
+      (let [~@(interleave vars (repeat (list lvar)))]
+        (bind* (~g a#) ~@gs)))))
 
 (def reify-var c/reify-var)
 
