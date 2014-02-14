@@ -126,7 +126,8 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) v
-     (list? v) (map #(walk* % s) v)
+     (seq? v) (map #(walk* % s) v)
+     (instance? clojure.lang.MapEntry v) (into [] (map #(walk* % s) v))
      (coll? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
