@@ -170,16 +170,17 @@
 
 (def reify-s mu/reify-s)
 
-(defn reify-var [x {:keys [s c] :as pkg}]
-  (if-let [a ((enforce-constraints x) pkg)]
-    (let [v (walk* x s)
+(defn reify-var [x pkg]
+  (if-let [pkg' ((enforce-constraints x) pkg)]
+    (let [{:keys [s c]} pkg'
+          v (walk* x s)
           r (reify-s v empty-s)]
       (if (empty? r)
         v
         (let [v' (walk* v r)]
           (if (empty? c)
             v'
-            ((reify-constraints v' r) pkg)))))
+            ((reify-constraints v' r) pkg')))))
     false))
 
 (defn rem:run [oc]
