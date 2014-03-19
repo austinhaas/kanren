@@ -1,7 +1,8 @@
 (ns com.pettomato.kanren.cKanren.cKanren
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.muKanren.muKanren :as mu]))
+   [com.pettomato.kanren.muKanren.muKanren :as mu])
+  #+cljs (:require-macros [com.pettomato.kanren.cKanren.cKanren :refer [build-aux-oc build-oc build-oc2 mplus* bind* conde fresh run* run]]))
 
 (def unit mu/unit)
 (def mzero mu/mzero)
@@ -10,8 +11,9 @@
 (def unit? mu/unit?)
 (def mzero? mu/mzero?)
 
-(defn lvar [] [:lvar (. clojure.lang.RT (nextID))])
-(def lvar? mu/lvar?)
+(def id-counter (atom 0))
+(defn lvar [] [:lvar (swap! id-counter inc)])
+(defn lvar? [x] (and (vector? x) (= (first x) :lvar)))
 (def lvar=? identical?)
 
 (def ext-s mu/ext-s)
@@ -31,7 +33,16 @@
    :c empty-c})
 
 (def walk mu/walk)
-(def walk* mu/walk*)
+
+(defn walk* [v s]
+  (let [v (walk v s)]
+    (cond
+     (lvar? v) v
+     (seq? v) (map #(walk* % s) v)
+     #+clj (instance? clojure.lang.MapEntry v) #+clj (into [] (map #(walk* % s) v))
+     #+cljs (satisfies? IMapEntry v) #+cljs (into [] (map #(walk* % s) v))
+     (coll? v) (into (empty v) (map #(walk* % s) v))
+     :else v)))
 
 (defn occurs-check [x v s]
   (let [v (walk v s)]
@@ -118,7 +129,7 @@
 (defmacro build-aux-oc [op args zs args2]
   (if (empty? args)
     `(let [~@(interleave zs args)]
-       (list (~op ~@zs) (var ~op) ~@zs))
+       (list (~op ~@zs) (quote ~op) ~@zs))
     `(build-aux-oc ~op ~(rest args) ~(cons (first args) zs) ~args)))
 
 (defmacro build-oc [op & args]
@@ -159,16 +170,22 @@
                                   (assoc pkg :c c''))
 
        (= (oc->rator (first c))
-          (var !=c-NEQ))        (let [oc (first c)
-                                      p' (oc->prefix oc)]
-                                  (cond
-                                   (subsumes? p' p ) pkg
-                                   (subsumes? p  p') (recur (rest c) c')
-                                   :else             (recur (rest c) (cons oc c'))))
+          (quote !=c-NEQ))        (let [oc (first c)
+                                        p' (oc->prefix oc)]
+                                    (cond
+                                     (subsumes? p' p ) pkg
+                                     (subsumes? p  p') (recur (rest c) c')
+                                     :else             (recur (rest c) (cons oc c'))))
 
           :else                    (recur (rest c) (cons (first c) c'))))))
 
-(def reify-s mu/reify-s)
+(defn reify-s [v s]
+  (let [v (walk v s)]
+    (cond
+     (lvar? v) (let [n (mu/reify-name (count s))]
+                 (mu/ext-s v n s))
+     (and (coll? v) (not (empty? v))) (reify-s (rest v) (reify-s (first v) s))
+     :else s)))
 
 (defn reify-var [x pkg]
   (if-let [pkg' ((enforce-constraints x) pkg)]

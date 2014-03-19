@@ -1,5 +1,6 @@
 (ns com.pettomato.kanren.muKanren.muKanren
-  (:refer-clojure :exclude [== conj disj]))
+  (:refer-clojure :exclude [== conj disj])
+  #+cljs (:require-macros [com.pettomato.kanren.muKanren.muKanren :refer [case-inf Zzz conj+ disj+ conde fresh run* run]]))
 
 (defn lvar [c] [:lvar c])
 
@@ -127,7 +128,8 @@
     (cond
      (lvar? v) v
      (seq? v) (map #(walk* % s) v)
-     (instance? clojure.lang.MapEntry v) (into [] (map #(walk* % s) v))
+     #+clj (instance? clojure.lang.MapEntry v) #+clj (into [] (map #(walk* % s) v))
+     #+cljs (satisfies? IMapEntry v) #+cljs (into [] (map #(walk* % s) v))
      (coll? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 
