@@ -2,7 +2,13 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.rKanren
-    [rKanren :refer (== != fresh conde condr run* run)]]))
+    #+clj
+    [rKanren :refer (== != fresh conde condr run* run)]
+    #+cljs
+    [rKanren :refer (== !=)]])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.cKanren.cKanren :refer [fresh conde condr run* run]]))
 
 #_(run* [q]
     (condr

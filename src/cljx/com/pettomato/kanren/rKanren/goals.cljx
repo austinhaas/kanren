@@ -2,7 +2,13 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
-   [com.pettomato.kanren.rKanren.rKanren :refer (== != fresh conde unit mzero reify-var)]))
+   #+clj
+   [com.pettomato.kanren.rKanren.rKanren :refer (== != fresh conde unit mzero reify-var)]
+   #+cljs
+   [com.pettomato.kanren.rKanren.rKanren :refer (== != unit mzero reify-var)])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.rKanren.rKanren] :refer [fresh conde]))
 
 (defn succeed [a] (unit a))
 

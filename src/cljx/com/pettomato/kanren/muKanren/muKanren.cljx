@@ -1,6 +1,8 @@
 (ns com.pettomato.kanren.muKanren.muKanren
   (:refer-clojure :exclude [== conj disj])
-  #+cljs (:require-macros [com.pettomato.kanren.muKanren.muKanren :refer [case-inf Zzz conj+ disj+ conde fresh run* run]]))
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.muKanren.muKanren :refer [case-inf Zzz conj+ disj+ conde fresh run* run]]))
 
 (defn lvar [c] [:lvar c])
 

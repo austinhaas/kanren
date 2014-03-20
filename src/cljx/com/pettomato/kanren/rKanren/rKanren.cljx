@@ -1,7 +1,10 @@
 (ns com.pettomato.kanren.rKanren.rKanren
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.cKanren.cKanren :as c]))
+   [com.pettomato.kanren.cKanren.cKanren :as c])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.rKanren.rKanren :refer [case-inf rdelay case-inf+ mplus* bind* conde condr fresh run* run]]))
 
 (def lvar c/lvar)
 

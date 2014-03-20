@@ -2,7 +2,9 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.muKanren.muKanren :as mu])
-  #+cljs (:require-macros [com.pettomato.kanren.cKanren.cKanren :refer [build-aux-oc build-oc build-oc2 mplus* bind* conde fresh run* run]]))
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.cKanren.cKanren :refer [build-aux-oc build-oc mplus* bind* conde fresh run* run]]))
 
 (def unit mu/unit)
 (def mzero mu/mzero)

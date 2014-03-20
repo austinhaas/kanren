@@ -3,8 +3,14 @@
   (:require
    [com.pettomato.kanren.util.llist :refer (empty-llist llist llist* llist->seq)]
    [com.pettomato.kanren.muKanren
+    #+clj
     [muKanren :refer (== fresh conde run* run)]
-    [goals :refer (emptyo conso membero appendo succeed anyo alwayso)]]))
+    #+cljs
+    [muKanren :refer (==)]
+    [goals :refer (emptyo conso membero appendo succeed anyo alwayso)]])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.muKanren.muKanren :refer [fresh conde run* run]]))
 
 #_(take 5
         (run* [q]
@@ -28,10 +34,6 @@
 
 #_(run 1 [q a b]
     (== q #{a b}))
-
-#_(run 1 [q]
-    (!= q 1)
-    (!= q 2))
 
 #_(run 5 [q]
     (membero q (llist (range 3))))
