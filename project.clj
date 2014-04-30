@@ -3,7 +3,7 @@
   :url "http://pettomato.com/"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.5.1"]]
+  :dependencies [[org.clojure/clojure "1.6.0"]]
   :jar-exclusions [#"\.cljx|\.swp|\.swo|\.DS_Store"]
   :source-paths ["src/cljx"]
   :test-paths ["target/test-classes"]
@@ -28,9 +28,9 @@
                         :compiler {:output-to "target/testable.js"
                                    :optimizations :advanced
                                    :pretty-print true}}]}
-  :profiles {:dev {:plugins [[org.clojure/clojurescript "0.0-2173"]
+  :profiles {:dev {:plugins [[org.clojure/clojurescript "0.0-2202"]
                              [com.keminglabs/cljx "0.3.2"]
-                             [lein-cljsbuild "1.0.2"]]
+                             [lein-cljsbuild "1.0.3"]]
                    :aliases {"cleantest" ["do" "clean," "cljx" "once," "test,"
                                           "cljsbuild" "test"]
                              "deploy" ["do" "clean," "cljx" "once," "deploy" "clojars"]}}})
