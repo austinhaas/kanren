@@ -23,6 +23,10 @@
                    :output-path "target/test-classes"
                    :rules :cljs}]}
   :hooks [cljx.hooks]
+  :cljsbuild {:builds [{:source-paths ["target/classes" "target/test-classes"]
+                        :compiler {:output-to "target/testable.js"
+                                   :optimizations :advanced
+                                   :pretty-print true}}]}
   :profiles {:dev {:plugins [[org.clojure/clojurescript "0.0-2202"]
                              [com.keminglabs/cljx "0.3.2"]
                              [lein-cljsbuild "1.0.3"]]}})
