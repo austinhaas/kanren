@@ -1,14 +1,21 @@
 (ns com.pettomato.kanren.muKanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
+   [com.pettomato.kanren.muKanren.types :refer [unit mzero]]
+   [com.pettomato.kanren.muKanren.extras :refer [reify-var]]
+   [com.pettomato.kanren.muKanren.core :refer [unify]]
    #+clj
-   [com.pettomato.kanren.muKanren.muKanren :refer (== fresh conde unit mzero reify-var)]
-   #+cljs
-   [com.pettomato.kanren.muKanren.muKanren :refer (== unit mzero reify-var)])
+   [com.pettomato.kanren.muKanren.extras-macros :refer [fresh conde]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.muKanren.muKanren :refer [fresh conde]]))
+   [com.pettomato.kanren.muKanren.extras-macros :refer [fresh conde]]))
+
+(defn == [u v]
+  (fn [{:keys [s] :as pkg}]
+    (if-let [s' (unify u v s)]
+      (unit (assoc pkg :s s'))
+      mzero)))
 
 (defn succeed [a] (unit a))
 

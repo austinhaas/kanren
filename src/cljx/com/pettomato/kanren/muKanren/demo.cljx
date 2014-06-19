@@ -1,13 +1,11 @@
 (ns com.pettomato.kanren.muKanren.demo
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.util.llist :refer (empty-llist llist llist* llist->seq)]
+   [com.pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq]]
    [com.pettomato.kanren.muKanren
     #+clj
-    [muKanren :refer (== fresh conde run* run)]
-    #+cljs
-    [muKanren :refer (==)]
-    [goals :refer (emptyo conso membero appendo succeed anyo alwayso)]])
+    [extras-macros :refer [fresh conde run* run]]
+    [goals :refer [== emptyo conso membero appendo succeed anyo alwayso]]])
   #+cljs
   (:require-macros
    [com.pettomato.kanren.muKanren.muKanren :refer [fresh conde run* run]]))
