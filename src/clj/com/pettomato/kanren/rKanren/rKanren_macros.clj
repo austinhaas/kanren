@@ -1,30 +1,9 @@
-(ns com.pettomato.kanren.rKanren.rKanren
-  (:refer-clojure :exclude [= conj disj]))
-
-(defmacro case-inf
-  [e _ e0 [f'] e1 [a'] e2 [a f] e3]
-  `(let [a# ~e]
-     (cond
-      (mzero? a#)  ~e0
-      (rdelay? a#) (let [~f' a#] ~e1)
-      (unit? a#)   (let [~a' a#] ~e2)
-      (choice? a#) (let [[~a ~f] a#] ~e3)
-      :else (throw (Error. (str "Unknown type of a-inf:" a#) )))))
-
-(defmacro rdelay [r & body]
-  `(set-rank
-    (fn [] ~@body)
-    ~r))
-
-(defmacro case-inf+
-  [e _ e0 [f'] e1 [a'] e2 [a f] e3]
-  `(let [a# ~e]
-     (cond
-      (mzero? a#)  (inc-rank ~e0)
-      (rdelay? a#) (let [~f' a#] (inc-rank ~e1))
-      (unit? a#)   (let [~a' a#] (inc-rank ~e2))
-      (choice? a#) (let [[~a ~f] a#] (inc-rank ~e3))
-      :else (throw (Error. (str "Unknown type of a-inf:" a#) )))))
+(ns com.pettomato.kanren.rKanren.rKanren-macros
+  (:require
+   [com.pettomato.kanren.rKanren.types :refer [lvar]]
+   [com.pettomato.kanren.rKanren.rank :refer [get-rank min-rank inc-rank]]
+   [com.pettomato.kanren.rKanren.rKanren :refer [mplus bind reify-var take* empty-pkg]]
+   [com.pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
 
 (defmacro mplus*
   ([e] e)
@@ -69,7 +48,7 @@
   `(fn [a#]
      (rdelay
       (get-rank a#)
-      (let [~@(interleave vars (repeat (list lvar)))]
+      (let [~@(interleave vars (repeat `(lvar)))]
         (bind* (~g a#) ~@gs)))))
 
 (defmacro run* [[v & vars] g & gs]

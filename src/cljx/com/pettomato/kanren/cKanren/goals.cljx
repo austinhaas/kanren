@@ -1,14 +1,18 @@
 (ns com.pettomato.kanren.cKanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
+   [com.pettomato.kanren.cKanren.types :refer [unit mzero]]
+   [com.pettomato.kanren.cKanren.core :refer [reify-var ==c !=c goal-construct]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren :refer (== != fresh conde unit mzero reify-var)]
-   #+cljs
-   [com.pettomato.kanren.cKanren.cKanren :refer (== != unit mzero reify-var)])
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.cKanren :refer [fresh conde]]))
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde]]))
+
+(defn == [u v] (goal-construct (==c u v)))
+
+(defn != [u v] (goal-construct (!=c u v)))
 
 (defn succeed [a] (unit a))
 

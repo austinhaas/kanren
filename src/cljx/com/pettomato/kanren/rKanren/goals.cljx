@@ -1,14 +1,18 @@
 (ns com.pettomato.kanren.rKanren.goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.util.llist :refer (empty-llist lcons)]
+   [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
+   [com.pettomato.kanren.cKanren.cKanren :as c]
+   [com.pettomato.kanren.rKanren.types :refer [unit mzero]]
+   [com.pettomato.kanren.rKanren.rKanren :refer [reify-var]]
    #+clj
-   [com.pettomato.kanren.rKanren.rKanren :refer (== != fresh conde unit mzero reify-var)]
-   #+cljs
-   [com.pettomato.kanren.rKanren.rKanren :refer (== != unit mzero reify-var)])
+   [com.pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.rKanren.rKanren] :refer [fresh conde]))
+   [com.pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]]))
+
+(def == c/==)
+(def != c/!=)
 
 (defn succeed [a] (unit a))
 

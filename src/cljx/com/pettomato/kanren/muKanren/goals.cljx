@@ -1,8 +1,9 @@
 (ns com.pettomato.kanren.muKanren.goals
-  (:refer-clojure :exclude [==])
+  (:refer-clojure :exclude [== disj])
   (:require
    [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
    [com.pettomato.kanren.muKanren.types :refer [unit mzero]]
+   [com.pettomato.kanren.muKanren.operators :refer [disj]] ; This is needed, b/c conde expands to disj.
    [com.pettomato.kanren.muKanren.extras :refer [reify-var]]
    [com.pettomato.kanren.muKanren.core :refer [unify]]
    #+clj

@@ -1,10 +1,9 @@
 (ns com.pettomato.kanren.muKanren.extras
-  (:refer-clojure :exclude [== conj disj])
   (:require
-   #+clj
-   [com.pettomato.kanren.muKanren.core-macros :refer [case-inf]]
    [com.pettomato.kanren.muKanren.types :refer [lvar lvar?]]
-   [com.pettomato.kanren.muKanren.core :refer [walk ext-s empty-s]])
+   [com.pettomato.kanren.muKanren.core :refer [empty-s ext-s walk]]
+   #+clj
+   [com.pettomato.kanren.muKanren.core-macros :refer [case-inf]])
   #+cljs
   (:require-macros
    [com.pettomato.kanren.muKanren.core-macros :refer [case-inf]]))
