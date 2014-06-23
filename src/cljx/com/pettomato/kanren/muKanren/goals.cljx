@@ -28,6 +28,14 @@
 (defn conso [a d l]
   (== (lcons a d) l))
 
+(defn firsto [l a]
+  (fresh [d]
+    (conso a d l)))
+
+(defn resto [l d]
+  (fresh [a]
+    (== (lcons a d) l)))
+
 (defn membero [x l]
   (fresh [head tail]
     (conso head tail l)

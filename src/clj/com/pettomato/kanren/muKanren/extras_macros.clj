@@ -30,6 +30,10 @@
     `(conj+ ~@gs)
     `(call:fresh (fn [~(first vars)] (fresh ~(rest vars) ~@gs)))))
 
+(defmacro all
+  [& gs]
+  `(conj+ ~@gs))
+
 (defmacro run* [[& vars] & gs]
   `(mK-reify (take* (call:empty-pkg
                      (fresh [~@vars]

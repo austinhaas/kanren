@@ -17,9 +17,8 @@
         v (walk v s)]
     (cond
      (and (lvar? u) (lvar? v) (lvar=? u v)) s
-     (lvar? u) (ext-s u v s)
-     (lvar? v) (ext-s v u s)
-     (and (coll? u) (coll? v))
-     (let [s (unify (first u) (first v) s)]
-       (and s (unify (next u) (next v) s)))
-     :else (and (= u v) s))))
+     (lvar? u)                              (ext-s u v s)
+     (lvar? v)                              (ext-s v u s)
+     (and (coll? u) (coll? v))              (let [s (unify (first u) (first v) s)]
+                                              (and s (unify (next u) (next v) s)))
+     :else                                  (and (= u v) s))))

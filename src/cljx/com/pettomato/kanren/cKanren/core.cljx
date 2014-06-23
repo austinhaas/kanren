@@ -200,10 +200,10 @@
 
 (defn reify-constraints-NEQ [m r]
   (fn [{:keys [c] :as pkg}]
-    (let [p* (remove any:lvar?
-                     (walk*
-                      (map seq (map oc->prefix c))
-                      r))]
+    (let [c  (walk* c r)
+          p* (->> (map oc->prefix c)
+                  (map seq)
+                  (remove any:lvar?))]
       (if (empty? p*)
         m
         `(~m :- (~'!= ~@p*))))))

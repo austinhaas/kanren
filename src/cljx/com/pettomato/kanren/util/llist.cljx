@@ -1,6 +1,6 @@
 (ns com.pettomato.kanren.util.llist)
 
-(def empty-llist nil)
+(def empty-llist '())
 
 (defn lcons [a d]
   (vector a d))

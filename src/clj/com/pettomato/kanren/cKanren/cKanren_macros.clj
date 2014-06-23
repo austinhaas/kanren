@@ -29,6 +29,12 @@
       (let [~@(interleave vars (repeat `(lvar)))]
         (bind* (~g a#) ~@gs)))))
 
+(defmacro all
+  [g & gs]
+  `(fn [a#]
+     (delay
+      (bind* (~g a#) ~@gs))))
+
 (defmacro run* [[v & vars] g & gs]
   `(let [~v (lvar)
          ~@(interleave vars (repeatedly lvar))]
