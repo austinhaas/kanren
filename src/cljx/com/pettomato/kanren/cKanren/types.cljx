@@ -1,6 +1,4 @@
-(ns com.pettomato.kanren.cKanren.types
-  (:require
-   [com.pettomato.kanren.muKanren.types :as mu]))
+(ns com.pettomato.kanren.cKanren.types)
 
 (def lvar-counter (atom 0))
 (defn lvar [] [:lvar (swap! lvar-counter inc)])
@@ -13,9 +11,9 @@
    (coll? t) (some any:lvar? t)
    :else     false))
 
-(def unit mu/unit)
-(def mzero mu/mzero)
-(def choice mu/choice)
+(def  mzero  false)
+(def  unit   identity)
+(defn choice [a f] [a f])
 
-(def unit? mu/unit?)
-(def mzero? mu/mzero?)
+(def mzero? false?)
+(def unit? map?)

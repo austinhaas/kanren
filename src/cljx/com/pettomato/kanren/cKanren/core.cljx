@@ -1,18 +1,16 @@
 (ns com.pettomato.kanren.cKanren.core
   (:require
    [com.pettomato.kanren.cKanren.types :refer [lvar? lvar=? any:lvar? unit mzero]]
-   [com.pettomato.kanren.muKanren.core :as mu]
-   [com.pettomato.kanren.muKanren.extras :refer [reify-name]]
    #+clj
    [com.pettomato.kanren.cKanren.core-macros :refer [build-oc]])
   #+cljs
   (:require-macros
    [com.pettomato.kanren.cKanren.core-macros :refer [build-oc]]))
 
-(def ext-s mu/ext-s)
-
-(def empty-s mu/empty-s)
+(def empty-s {})
 (def empty-c ())
+
+(defn ext-s [x v s] (assoc s x v))
 
 (declare oc->rands)
 
@@ -25,7 +23,11 @@
   {:s empty-s
    :c empty-c})
 
-(def walk mu/walk)
+(defn walk [u s]
+  (let [x (get s u ::not-found)]
+    (if (= x ::not-found)
+      u
+      (recur x s))))
 
 (defn walk* [v s]
   (let [v (walk v s)]
@@ -63,6 +65,20 @@
                                 [v1 & vs] v]
                             (recur (list* [u1 v1] [us vs] e) s p))
                :else      false)))))
+
+(defn unify [u v s]
+  (let [u (walk u s)
+        v (walk v s)]
+    (cond
+     (= u v)         s
+     (lvar? u)       (and (not (occurs-check u v s))
+                          (ext-s u v s))
+     (lvar? v)       (and (not (occurs-check v u s))
+                          (ext-s v u s))
+     (and (coll? u)
+          (coll? v)) (let [s (unify (first u) (first v) s)]
+                       (and s (unify (rest u) (rest v) s)))
+     :else           false)))
 
 (def identity-M identity)
 
@@ -153,6 +169,9 @@
                                      :else             (recur (rest c) (cons oc c'))))
 
           :else                    (recur (rest c) (cons (first c) c'))))))
+
+(defn reify-name [n]
+  (symbol (str "_" "." n)))
 
 (defn reify-s [v s]
   (let [v (walk v s)]

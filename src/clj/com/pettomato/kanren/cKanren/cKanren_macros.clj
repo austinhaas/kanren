@@ -1,7 +1,7 @@
 (ns com.pettomato.kanren.cKanren.cKanren-macros
   (:require
    [com.pettomato.kanren.cKanren.types :refer [lvar]]
-   [com.pettomato.kanren.muKanren.operators :refer [mplus bind]]
+   [com.pettomato.kanren.cKanren.operators :refer [mplus bind]]
    [com.pettomato.kanren.cKanren.core :refer [reify-var empty-pkg goal-construct]]
    [com.pettomato.kanren.cKanren.extras :refer [take*]]))
 

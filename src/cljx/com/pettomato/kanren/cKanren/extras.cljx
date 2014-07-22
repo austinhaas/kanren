@@ -3,10 +3,19 @@
   (:require
    [com.pettomato.kanren.cKanren.types :refer [lvar]]
    [com.pettomato.kanren.cKanren.core :refer [goal-construct]]
-   [com.pettomato.kanren.muKanren.extras :as mu]
-   [com.pettomato.kanren.muKanren.operators :refer [disj]]))
+   [com.pettomato.kanren.cKanren.operators :refer [disj]]
+   #+clj
+   [com.pettomato.kanren.cKanren.core-macros :refer [case-inf]])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.cKanren.core-macros :refer [case-inf]]))
 
-(def take* mu/take*)
+(defn take* [f]
+  (case-inf (force f)
+            []    ()
+            [f]   (recur f)
+            [a]   (cons a ())
+            [a f] (cons a (lazy-seq (take* f)))))
 
 (defn freshen [vars t]
   (let [smap (zipmap vars (repeatedly lvar))]

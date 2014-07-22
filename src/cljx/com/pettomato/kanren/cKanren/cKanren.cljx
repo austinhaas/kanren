@@ -17,6 +17,7 @@
 
 (def empty-pkg core/empty-pkg)
 (def reify-var core/reify-var)
+(def unify     core/unify)
 
 (def take*   extras/take*)
 (def freshen extras/freshen)

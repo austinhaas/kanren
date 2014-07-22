@@ -611,3 +611,5 @@
   (is (= (run* [q]
            (!= {1 2 3 4} 'foo))
         '(_.0))))
+
+#_(clojure.test/run-tests)
