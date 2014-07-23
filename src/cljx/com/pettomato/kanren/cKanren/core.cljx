@@ -33,11 +33,10 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) v
-     (seq? v) (map #(walk* % s) v)
-     #+clj (instance? clojure.lang.MapEntry v) #+clj (into [] (map #(walk* % s) v))
-     #+cljs (satisfies? IMapEntry v) #+cljs (into [] (map #(walk* % s) v))
+     (seq? v)  (map #(walk* % s) v)
+     (map? v)  (zipmap (walk* (keys v) s) (walk* (vals v) s))
      (coll? v) (into (empty v) (map #(walk* % s) v))
-     :else v)))
+     :else     v)))
 
 (defn occurs-check [x v s]
   (let [v (walk v s)]
