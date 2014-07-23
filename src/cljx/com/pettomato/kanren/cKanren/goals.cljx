@@ -5,10 +5,10 @@
    [com.pettomato.kanren.cKanren.types :refer [unit mzero]]
    [com.pettomato.kanren.cKanren.core :refer [reify-var ==c !=c goal-construct]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde]])
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde]]))
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]]))
 
 (defn == [u v] (goal-construct (==c u v)))
 
@@ -83,3 +83,5 @@
   (fn [{:keys [s] :as pkg}]
     (println msg)
     (unit pkg)))
+
+(defn onceo [g] (condu (g)))
