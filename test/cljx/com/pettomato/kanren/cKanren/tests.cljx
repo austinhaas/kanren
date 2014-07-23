@@ -612,4 +612,14 @@
            (!= {1 2 3 4} 'foo))
         '(_.0))))
 
+(deftest norvig-test
+  ;; http://norvig.com/unify-bug.pdf
+  (is (run* [q] (fresh [x y]
+                  (== ['p x y] ['p y x])))
+      '(_.0))
+  (is (run* [x] (fresh [x y z]
+                  (== ['q ['p x y] ['p y x]]
+                      ['q z z])))
+      '(_.0)))
+
 #_(clojure.test/run-tests)
