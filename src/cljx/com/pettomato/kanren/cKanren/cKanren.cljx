@@ -1,21 +1,15 @@
 (ns com.pettomato.kanren.cKanren.cKanren
   (:require
-   [com.pettomato.kanren.cKanren.lvar
-    :refer [any-relevant-lvar?]]
-   [com.pettomato.kanren.cKanren.pkg
-    :refer [empty-s]]
-   [com.pettomato.kanren.cKanren.streams
-    :refer [mzero unit choice empty-f]]
-   [com.pettomato.kanren.cKanren.miniKanren
-    :refer [walk* unify-prefix reify-s]]
-   [com.pettomato.kanren.cKanren.constraint-helpers
-    :refer [oc->proc oc->rands]]
+   [com.pettomato.kanren.cKanren.lvar :refer [any-relevant-lvar?]]
+   [com.pettomato.kanren.cKanren.pkg :refer [empty-s]]
+   [com.pettomato.kanren.cKanren.streams :refer [mzero unit choice empty-f]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify-prefix reify-s]]
+   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->proc oc->rands]]
    #+clj
-   [com.pettomato.kanren.cKanren.miniKanren-operators
-    :refer [all]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]])
   #+cljx
-   [com.pettomato.kanren.cKanren.miniKanren-operators
-    :refer [all]])
+  (:require-macros
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
 
 (def process-prefix-impl      (atom nil))
 (def enforce-constraints-impl (atom nil))

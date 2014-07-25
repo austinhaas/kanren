@@ -57,6 +57,8 @@
 
 (def alwayso (anyo succeed))
 
+(defn onceo [g] (condu (g)))
+
 (defn trace-lvar [msg v]
   (assert false)
   #_(fn [{:keys [s] :as pkg}]
@@ -77,5 +79,3 @@
   (fn [{:keys [s] :as pkg}]
     (println msg)
     (unit pkg)))
-
-(defn onceo [g] (condu (g)))

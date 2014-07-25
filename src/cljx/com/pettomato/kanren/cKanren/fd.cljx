@@ -7,6 +7,7 @@
    [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
    [com.pettomato.kanren.cKanren.cKanren :refer [identity-M compose-M run-constraints]]
    [com.pettomato.kanren.cKanren.goals :refer [succeed fail == onceo]]
+   #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [conde all]])
   #+cljs
   (:require-macros
