@@ -1,14 +1,14 @@
 (ns com.pettomato.kanren.cKanren.extras
   (:refer-clojure :exclude [disj])
   (:require
-   [com.pettomato.kanren.cKanren.types :refer [lvar]]
+   [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.cKanren.core :refer [goal-construct]]
    [com.pettomato.kanren.cKanren.operators :refer [disj]]
    #+clj
-   [com.pettomato.kanren.cKanren.core-macros :refer [case-inf]])
+   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.core-macros :refer [case-inf]]))
+   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
 
 (defn take* [f]
   (case-inf (force f)

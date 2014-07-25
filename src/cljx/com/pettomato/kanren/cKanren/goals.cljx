@@ -2,17 +2,26 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
-   [com.pettomato.kanren.cKanren.types :refer [unit mzero]]
-   [com.pettomato.kanren.cKanren.core :refer [reify-var ==c !=c goal-construct]]
+   [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
+   [com.pettomato.kanren.cKanren.streams :refer [unit mzero]]
+   [com.pettomato.kanren.cKanren.core :refer [unify-prefix reify-var goal-construct process-prefix]]
    #+clj
    [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]])
   #+cljs
   (:require-macros
    [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]]))
 
-(defn == [u v] (goal-construct (==c u v)))
+(defn ==c [u v]
+  (fn [{:keys [s c] :as pkg}]
+    (if-let [sp (unify-prefix (list [u v]) s)]
+      (let [[s' p] sp]
+        (if (empty? p)
+          pkg
+          (let [pkg' (assoc pkg :s s')]
+            ((process-prefix p c) pkg'))))
+      false)))
 
-(defn != [u v] (goal-construct (!=c u v)))
+(defn == [u v] (goal-construct (==c u v)))
 
 (defn succeed [a] (unit a))
 
@@ -32,23 +41,6 @@
   (fresh [a]
     (== (lcons a d) l)))
 
-(defn membero [x l]
-  (fresh [head tail]
-    (conso head tail l)
-    (conde
-      [(== x head)]
-      [(!= x head) (membero x tail)])))
-
-(defn nonmembero
-  "A relation where l is a collection, such that l does not contain x."
-  [x l]
-  (conde
-    [(emptyo l)]
-    [(fresh [head tail]
-       (conso head tail l)
-       (!= x head)
-       (nonmembero x tail))]))
-
 (defn appendo [x y z]
   (conde
     [(emptyo x) (== y z)]
@@ -65,7 +57,8 @@
 (def alwayso (anyo succeed))
 
 (defn trace-lvar [msg v]
-  (fn [{:keys [s] :as pkg}]
+  (assert false)
+  #_(fn [{:keys [s] :as pkg}]
     (println msg (reify-var v s))
     (unit pkg)))
 

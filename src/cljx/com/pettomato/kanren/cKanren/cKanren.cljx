@@ -1,21 +1,25 @@
 (ns com.pettomato.kanren.cKanren.cKanren
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.cKanren.types :as types]
+   [com.pettomato.kanren.cKanren.lvar :as lvar]
+   [com.pettomato.kanren.cKanren.streams :as streams]
+   [com.pettomato.kanren.cKanren.pkg :as pkg]
    [com.pettomato.kanren.cKanren.core :as core]
    [com.pettomato.kanren.cKanren.extras :as extras]
    [com.pettomato.kanren.cKanren.goals :as goals]))
 
-(def unit   types/unit)
-(def mzero  types/mzero)
-(def choice types/choice)
-(def unit?  types/unit?)
-(def mzero? types/mzero?)
-(def lvar   types/lvar)
-(def lvar?  types/lvar?)
-(def lvar=? types/lvar=?)
+(def unit   streams/unit)
+(def mzero  streams/mzero)
+(def choice streams/choice)
+(def unit?  streams/unit?)
+(def mzero? streams/mzero?)
 
-(def empty-pkg core/empty-pkg)
+(def lvar   lvar/lvar)
+(def lvar?  lvar/lvar?)
+(def lvar=? lvar/lvar=?)
+
+(def empty-pkg pkg/empty-pkg)
+
 (def reify-var core/reify-var)
 (def unify     core/unify)
 
@@ -38,3 +42,4 @@
 (def trace-pkg  goals/trace-pkg)
 (def trace-s    goals/trace-s)
 (def log        goals/log)
+(def onceo      goals/onceo)

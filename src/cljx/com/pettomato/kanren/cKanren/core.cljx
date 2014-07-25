@@ -1,27 +1,27 @@
 (ns com.pettomato.kanren.cKanren.core
   (:require
-   [com.pettomato.kanren.cKanren.types :refer [lvar? lvar=? any:lvar? unit mzero]]
+   [com.pettomato.kanren.cKanren.streams
+    :refer [mzero unit choice empty-f]]
+   [com.pettomato.kanren.cKanren.lvar
+    :refer [lvar? lvar=? any-relevant-lvar?]]
+   [com.pettomato.kanren.cKanren.pkg
+    :refer [empty-s ext-s]]
+   [com.pettomato.kanren.cKanren.constraints
+    :refer [oc->proc oc->rands]]
    #+clj
-   [com.pettomato.kanren.cKanren.core-macros :refer [build-oc]])
-  #+cljs
-  (:require-macros
-   [com.pettomato.kanren.cKanren.core-macros :refer [build-oc]]))
+   [com.pettomato.kanren.cKanren.cKanren-macros
+    :refer [all]])
+  #+cljx
+   [com.pettomato.kanren.cKanren.cKanren-macros
+    :refer [all]])
 
-(def empty-s {})
-(def empty-c ())
+(def process-prefix-impl      (atom nil))
+(def enforce-constraints-impl (atom nil))
+(def reify-constraints-impl   (atom nil))
 
-(defn ext-s [x v s] (assoc s x v))
-
-(declare oc->rands)
-
-(defn ext-c [oc c]
-  (if (any:lvar? (oc->rands oc))
-    (cons oc c)
-    c))
-
-(def empty-pkg
-  {:s empty-s
-   :c empty-c})
+(defn process-prefix [p c]    (@process-prefix-impl p c))
+(defn enforce-constraints [x] (@enforce-constraints-impl x))
+(defn reify-constraints [m r] (@reify-constraints-impl m r))
 
 (defn walk [u s]
   (let [x (get s u ::not-found)]
@@ -45,8 +45,8 @@
      (coll? v) (some #(occurs-check x % s) v)
      :else     false)))
 
-(defn unify:prefix
-  ([e s] (unify:prefix e s empty-s))
+(defn unify-prefix
+  ([e s] (unify-prefix e s empty-s))
   ([e s p]
      (if (empty? e)
        [s p]
@@ -79,6 +79,12 @@
                        (and s (unify (rest u) (rest v) s)))
      :else           false)))
 
+(defn subsumes? [p s]
+  (if-let [sp (unify-prefix (seq p) s)]
+    (let [[s' p'] sp]
+      (= s s'))
+    false))
+
 (def identity-M identity)
 
 (defn compose-M [f1 f2]
@@ -86,103 +92,37 @@
     (let [a (f1 a)]
       (and a (f2 a)))))
 
-(declare process-prefix enforce-constraints reify-constraints)
-
-(defn oc->proc   [oc] (first oc))
-(defn oc->rator  [oc] (first (rest oc)))
-(defn oc->rands  [oc] (rest (rest oc)))
-(defn oc->prefix [oc] (first (oc->rands oc)))
-
-(defn any-relevant:lvar? [t x*]
-  (cond
-   (lvar? t) (contains? x* t)
-   (coll? t) (some #(any-relevant:lvar? % x*) t)
-   :else     false))
-
-(defn recover:lvars [p]
-  (reduce (fn [r [x v]]
-            (if (lvar? v)
-              (conj r x v)
-              (conj r x)))
-          #{}
-          p))
-
-(defn ==c [u v]
-  (fn [{:keys [s c] :as pkg}]
-    (if-let [sp (unify:prefix (list [u v]) s)]
-      (let [[s' p] sp]
-        (if (empty? p)
-          pkg
-          (let [pkg' (assoc pkg :s s')]
-            ((process-prefix p c) pkg'))))
-      false)))
-
-(declare normalize-store)
-
-(defn !=c-NEQ [p]
-  (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify:prefix (seq p) s)]
-      (let [[s' p'] sp]
-        (if (empty? p')
-          false
-          ((normalize-store p') pkg)))
-      pkg)))
-
-(defn !=c [u v]
-  (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify:prefix (list [u v]) s)]
-      (let [[s' p] sp]
-        ((!=c-NEQ p) pkg))
-      pkg)))
-
-(defn subsumes? [p s]
-  (if-let [sp (unify:prefix (seq p) s)]
-    (let [[s' p'] sp]
-      (= s s'))
-    false))
-
-(defn normalize-store [p]
-  (fn [{:keys [c] :as pkg}]
-    (loop [c c, c' ()]
-      (cond
-       (empty? c)               (let [c'' (ext-c (build-oc !=c-NEQ p) c')]
-                                  (assoc pkg :c c''))
-
-       (= (oc->rator (first c))
-          (quote !=c-NEQ))        (let [oc (first c)
-                                        p' (oc->prefix oc)]
-                                    (cond
-                                     (subsumes? p' p ) pkg
-                                     (subsumes? p  p') (recur (rest c) c')
-                                     :else             (recur (rest c) (cons oc c'))))
-
-          :else                    (recur (rest c) (cons (first c) c'))))))
-
 (defn reify-name [n]
   (symbol (str "_" "." n)))
 
 (defn reify-s [v s]
   (let [v (walk v s)]
     (cond
-     (lvar? v) (let [n (reify-name (count s))]
-                 (ext-s v n s))
-     (and (coll? v) (not (empty? v))) (reify-s (rest v) (reify-s (first v) s))
+     (lvar? v)
+     (let [n (reify-name (count s))]
+       (ext-s v n s))
+
+     (and (coll? v) (not (empty? v)))
+     (reify-s (rest v) (reify-s (first v) s))
+
      :else s)))
 
-(defn reify-var [x pkg]
-  (if-let [pkg' ((enforce-constraints x) pkg)]
-    (let [{:keys [s c]} pkg'
-          v (walk* x s)
-          r (reify-s v empty-s)]
-      (if (empty? r)
-        v
-        (let [v' (walk* v r)]
-          (if (empty? c)
-            v'
-            ((reify-constraints v' r) pkg')))))
-    false))
+(defn reify-var [x]
+  (all
+   (enforce-constraints x)
+   (fn [{:keys [s d c] :as pkg}]
+     (choice
+      (let [v (walk* x s)
+            r (reify-s v empty-s)]
+        (cond
+         (empty? r) v
+         :else      (let [v (walk* v r)]
+                      (cond
+                       (empty? c) v
+                       :else      ((reify-constraints v r) pkg)))))
+      empty-f))))
 
-(defn rem:run [oc]
+(defn rem-run [oc]
   (fn [{:keys [s d c] :as pkg}]
     (if (some #(= oc %) c)
       (let [c' (remove #(= oc %) c)]
@@ -193,31 +133,12 @@
   (cond
    (empty? c)             identity-M
 
-   (any-relevant:lvar?
+   (any-relevant-lvar?
     (oc->rands (first c))
-    x*)                   (compose-M (rem:run (first c))
+    x*)                   (compose-M (rem-run (first c))
                                      (run-constraints x* (rest c)))
 
     :else                  (run-constraints x* (rest c))))
-
-(defn process-prefix-NEQ [p c]
-  (run-constraints (recover:lvars p) c))
-
-(defn enforce-constraints-NEQ [x] unit)
-
-(defn reify-constraints-NEQ [m r]
-  (fn [{:keys [c] :as pkg}]
-    (let [c  (walk* c r)
-          p* (->> (map oc->prefix c)
-                  (map seq)
-                  (remove any:lvar?))]
-      (if (empty? p*)
-        m
-        `(~m :- (~'!= ~@p*))))))
-
-(def process-prefix process-prefix-NEQ)
-(def enforce-constraints enforce-constraints-NEQ)
-(def reify-constraints reify-constraints-NEQ)
 
 (defn goal-construct [f]
   (fn [pkg]

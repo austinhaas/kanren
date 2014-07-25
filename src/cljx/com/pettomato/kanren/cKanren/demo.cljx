@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq]]
-   [com.pettomato.kanren.cKanren.goals :refer [== != emptyo conso membero nonmembero appendo succeed anyo alwayso]]
+   [com.pettomato.kanren.cKanren.goals :refer [== emptyo conso appendo succeed anyo alwayso]]
+   [com.pettomato.kanren.cKanren.disequality-goals :refer [!= membero nonmembero]]
    #+clj
    [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde run* run]])
   #+cljs

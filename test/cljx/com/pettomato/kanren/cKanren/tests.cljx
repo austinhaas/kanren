@@ -4,17 +4,48 @@
    #+clj
    [clojure.test :refer [is deftest]]
    [com.pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq lcons]]
-   [com.pettomato.kanren.cKanren.types :refer [lvar]]
-   [com.pettomato.kanren.cKanren.goals :refer [== != succeed fail emptyo conso firsto resto membero nonmembero appendo anyo alwayso onceo]]
-   [com.pettomato.kanren.cKanren.core :refer [empty-s ext-s walk*]]
+   [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
+   [com.pettomato.kanren.cKanren.goals :refer
+    [== succeed fail emptyo conso firsto resto appendo anyo alwayso onceo]]
+   [com.pettomato.kanren.cKanren.disequality-goals
+    :refer [!= membero nonmembero]]
+   [com.pettomato.kanren.cKanren.fd-goals :as fd]
+   [com.pettomato.kanren.cKanren.pkg :refer [empty-s ext-s]]
+   [com.pettomato.kanren.cKanren.core :refer [walk* compose-M]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all run* run condu]]
+   [com.pettomato.kanren.cKanren.run :refer [run* run]]
+   #+clj
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all condu]]
    #+cljs
    [cemerick.cljs.test])
   #+cljs
   (:require-macros
    [cemerick.cljs.test :refer [is deftest]]
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all run* run condu]]))
+   [com.pettomato.kanren.cKanren.run :refer [run* run]]
+   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all condu]]))
+
+(require '[com.pettomato.kanren.cKanren.core
+           :refer [process-prefix-impl enforce-constraints-impl reify-constraints-impl]])
+(require '[com.pettomato.kanren.cKanren.fd
+           :refer [process-prefix-FD enforce-constraints-FD reify-constraints-FD]])
+(require '[com.pettomato.kanren.cKanren.disequality
+           :refer [process-prefix-NEQ enforce-constraints-NEQ reify-constraints-NEQ]])
+(require '[com.pettomato.kanren.cKanren.goals :refer [trace-pkg]])
+
+
+(reset! process-prefix-impl
+        (fn [p c]
+          (compose-M (process-prefix-NEQ p c)
+                     (process-prefix-FD p c))))
+(reset! enforce-constraints-impl
+        (fn [x]
+          (compose-M (enforce-constraints-NEQ x)
+                     (enforce-constraints-FD x))))
+(reset! reify-constraints-impl
+        (fn [m r]
+          (reify-constraints-NEQ m r)
+          #_(compose-M
+                     (reify-constraints-FD m r))))
 
 ;; =============================================================================
 ;; walk*

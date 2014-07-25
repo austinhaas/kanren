@@ -1,10 +1,9 @@
 (ns com.pettomato.kanren.cKanren.cKanren-macros
   (:require
-   [com.pettomato.kanren.cKanren.types :refer [lvar mzero]]
+   [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
+   [com.pettomato.kanren.cKanren.streams :refer [mzero]]
    [com.pettomato.kanren.cKanren.operators :refer [mplus bind]]
-   [com.pettomato.kanren.cKanren.core :refer [reify-var empty-pkg]]
-   [com.pettomato.kanren.cKanren.extras :refer [take*]]
-   [com.pettomato.kanren.cKanren.core-macros :refer [case-inf]]))
+   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
 
 (defmacro mplus*
   ([e] e)
@@ -35,15 +34,6 @@
   `(fn [a#]
      (delay
       (bind* (~g a#) ~@gs))))
-
-(defmacro run* [[v & vars] g & gs]
-  `(let [~v (lvar)
-         ~@(interleave vars (repeatedly lvar))]
-     (map #(reify-var ~v %)
-          (take* (bind* (~g empty-pkg) ~@gs)))))
-
-(defmacro run [n [& vars] & gs]
-  `(take ~n (run* ~vars ~@gs)))
 
 ;;; Impure control operators.
 
