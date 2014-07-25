@@ -402,14 +402,14 @@
            (fresh [x]
              (!= x 1)
              (== q x)))
-         '((_.0 :- (!= ([_.0 1])))))))
+         '((_.0 :- (!= {_.0 1}))))))
 
 (deftest test-disequality-2
   (is (= (run* [q]
            (fresh [x]
              (== q x)
              (!= x 1)))
-         '((_.0 :- (!= ([_.0 1])))))))
+         '((_.0 :- (!= {_.0 1}))))))
 
 (deftest test-disequality-3
   (is (= (run* [q]
@@ -523,7 +523,7 @@
              (== q [x y])
              (!= x 1)
              (!= y 2)))
-         '(([_.0 _.1] :- (!= ([_.1 2]) ([_.0 1])))))))
+         '(([_.0 _.1] :- (!= {_.0 1, _.1 2}))))))
 
 (deftest test-disequality-16
   (is (= (run* [q]
@@ -535,14 +535,11 @@
          '())))
 
 (deftest test-disequality-17
-  ;; This is broken because although we seem to get the correct
-  ;; answer, the constraint is not reified to the same structure as
-  ;; the test case.
-  #_(is (= (run* [q]
+  (is (= (run* [q]
            (fresh [x y]
              (!= [1 x] [y 2])
              (== q [x y])))
-         '(([_.0 _.1] :- (!= ([_.0 2]) ([_.1 1]))))))
+         '(([_.0 _.1] :- (!= {_.0 2, _.1 1})))))
   ;; This works in core.logic, but I don't see why the disequality
   ;; portion of this result is desirable, since it doesn't include the
   ;; query variable.

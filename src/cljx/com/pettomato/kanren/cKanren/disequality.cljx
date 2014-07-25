@@ -56,7 +56,8 @@
   (fn [{:keys [c] :as pkg}]
     (let [c  (walk* c r)
           p* (->> (map oc->prefix c)
-                  (remove any-lvar?))]
+                  (remove any-lvar?)
+                  (into {}))]
       (if (empty? p*)
         m
-        `(~m :- (~'!= ~@p*))))))
+        `(~m :- (~'!= ~p*))))))
