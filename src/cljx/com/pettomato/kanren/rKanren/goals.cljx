@@ -2,9 +2,8 @@
   (:refer-clojure :exclude [==])
   (:require
    [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
-   [com.pettomato.kanren.cKanren.cKanren :as c]
-   [com.pettomato.kanren.rKanren.types :refer [unit mzero]]
-   [com.pettomato.kanren.rKanren.rKanren :refer [reify-var]]
+   [com.pettomato.kanren.cKanren.cKanren-api :as c]
+   [com.pettomato.kanren.rKanren.streams :refer [unit mzero]]
    #+clj
    [com.pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]])
   #+cljs
@@ -58,7 +57,7 @@
 
 (defn trace-lvar [msg v]
   (fn [{:keys [s] :as pkg}]
-    (println msg (reify-var v s))
+    (println msg (c/reify-var v s))
     (unit pkg)))
 
 (defn trace-pkg [msg]

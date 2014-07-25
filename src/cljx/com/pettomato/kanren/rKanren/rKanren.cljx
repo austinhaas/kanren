@@ -1,7 +1,7 @@
 (ns com.pettomato.kanren.rKanren.rKanren
   (:require
-   [com.pettomato.kanren.cKanren.cKanren :as c]
-   [com.pettomato.kanren.rKanren.types :refer [mzero choice]]
+   [com.pettomato.kanren.rKanren.pkg :as pkg]
+   [com.pettomato.kanren.rKanren.streams :refer [mzero choice]]
    [com.pettomato.kanren.rKanren.rank :refer [set-rank get-rank]]
    #+clj
    [com.pettomato.kanren.rKanren.case-inf :refer [case-inf]]
@@ -45,8 +45,6 @@
              [a]    (g a)
              [a f]  (mplus (g a) (rdelay (get-rank f) (bind (rforce f) g)))))
 
-(def reify-var c/reify-var)
-
 (defn take* [f]
   (case-inf (rforce f)
             []     ()
@@ -54,4 +52,4 @@
             [a]    (cons a ())
             [a f'] (cons a (lazy-seq (take* f')))))
 
-(def empty-pkg (set-rank c/empty-pkg 0))
+(def empty-pkg (set-rank pkg/empty-pkg 0))

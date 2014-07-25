@@ -7,15 +7,15 @@
    [com.pettomato.kanren.cKanren.fd :refer [process-fd make-fd fd-min fd-max fd-singleton? fd-singleton-element fd-disjoint? fd-diff]]
    #+clj
    [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
+   #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
+   #+clj
    [com.pettomato.kanren.cKanren.fd-implementor :refer [let-fd c-op]])
   #+cljs
   (:require-macros
    [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
    [com.pettomato.kanren.cKanren.fd-implementor :refer [let-fd c-op]]))
-
-(alias 'core 'clojure.core)
 
 (defn domc [x n*]
   (fn [{:keys [s d c] :as pkg}]
@@ -26,8 +26,8 @@
         (let [u-min (fd-min ud)
               v-max (fd-max vd)]
           (compose-M
-           (process-fd u (take-while #(core/<= % v-max) ud))
-           (process-fd v (drop-while #(core/<  % u-min) vd))))))
+           (process-fd u (take-while #(clojure.core/<= % v-max) ud))
+           (process-fd v (drop-while #(clojure.core/<  % u-min) vd))))))
 
 (defn +c [u v w]
   (c-op +c [[u ud] [v vd] [w wd]]
@@ -35,10 +35,10 @@
               v-min (fd-min vd), v-max (fd-max vd)
               w-min (fd-min wd), w-max (fd-max wd)]
           (compose-M
-           (process-fd w (range (core/+ u-min v-min) (inc (core/+ u-max v-max))))
+           (process-fd w (range (clojure.core/+ u-min v-min) (inc (clojure.core/+ u-max v-max))))
            (compose-M
-            (process-fd u (range (core/- w-min v-max) (inc (core/- w-max v-min))))
-            (process-fd v (range (core/- w-min u-max) (inc (core/- w-max u-min)))))))))
+            (process-fd u (range (clojure.core/- w-min v-max) (inc (clojure.core/- w-max v-min))))
+            (process-fd v (range (clojure.core/- w-min u-max) (inc (clojure.core/- w-max u-min)))))))))
 
 (defn !=c-FD [u v]
   (fn [{:keys [s d c] :as pkg}]

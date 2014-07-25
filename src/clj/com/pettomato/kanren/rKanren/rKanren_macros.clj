@@ -1,8 +1,9 @@
 (ns com.pettomato.kanren.rKanren.rKanren-macros
   (:require
-   [com.pettomato.kanren.rKanren.types :refer [lvar]]
+   [com.pettomato.kanren.rKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.rKanren.rank :refer [get-rank min-rank inc-rank]]
-   [com.pettomato.kanren.rKanren.rKanren :refer [mplus bind reify-var take* empty-pkg]]
+   [com.pettomato.kanren.cKanren.cKanren-api :refer [reify-var]]
+   [com.pettomato.kanren.rKanren.rKanren :refer [mplus bind take* empty-pkg]]
    [com.pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
 
 (defmacro mplus*
@@ -51,11 +52,13 @@
       (let [~@(interleave vars (repeat `(lvar)))]
         (bind* (~g a#) ~@gs)))))
 
-(defmacro run* [[v & vars] g & gs]
-  `(let [~v (lvar)
-         ~@(interleave vars (repeatedly lvar))]
-     (map #(reify-var ~v %)
-          (take* (bind* (~g empty-pkg) ~@gs)))))
+(defmacro run* [[v & vars] & gs]
+  `(take*
+    (delay
+     ((fresh [~v ~@vars]
+        ~@gs
+        (c/reify-var ~v))
+      empty-pkg))))
 
 (defmacro run [n [& vars] & gs]
   `(take ~n (run* ~vars ~@gs)))

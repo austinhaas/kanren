@@ -366,21 +366,6 @@
         m2 {1 4 3 x}]
     (is (= (unify m1 m2 empty-s) false))))
 
-(defstruct foo-struct :a :b)
-
-(deftest unify-struct-map-1
-  (let [x (lvar 'x)
-        m1 (struct-map foo-struct :a 1 :b 2)
-        m2 (struct-map foo-struct :a 1 :b x)
-        os (ext-s x 2 empty-s)]
-    (is (= (unify m1 m2 empty-s) os))))
-
-(deftest unify-struct-map-2
-  (let [x (lvar 'x)
-        m1 (struct-map foo-struct :a 1 :b 2)
-        m2 (struct-map foo-struct :a 1 :b 3)]
-    (is (= (unify m1 m2 empty-s) false))))
-
 ;; =============================================================================
 ;; walk
 

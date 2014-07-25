@@ -5,10 +5,13 @@
    [com.pettomato.kanren.cKanren.goals :refer [== emptyo conso appendo succeed anyo alwayso]]
    [com.pettomato.kanren.cKanren.disequality-goals :refer [!= membero nonmembero]]
    #+clj
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde run* run]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]
+   #+clj
+   [com.pettomato.kanren.cKanren.run :refer [run* run]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde run* run]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]
+   [com.pettomato.kanren.cKanren.run :refer [run* run]]))
 
 #_(take 5
         (run* [q]

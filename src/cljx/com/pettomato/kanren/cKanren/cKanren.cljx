@@ -7,7 +7,7 @@
    [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->proc oc->rands]]
    #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]])
-  #+cljx
+  #+cljs
   (:require-macros
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
 

@@ -1,6 +1,6 @@
 (ns com.pettomato.kanren.rKanren.rank
   (:require
-   [com.pettomato.kanren.rKanren.types :refer [mzero choice]]
+   [com.pettomato.kanren.rKanren.streams :refer [mzero choice]]
    #+clj
    [com.pettomato.kanren.rKanren.case-inf :refer [case-inf]])
   #+cljs

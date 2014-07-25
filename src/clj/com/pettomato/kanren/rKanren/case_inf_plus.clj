@@ -1,6 +1,6 @@
 (ns com.pettomato.kanren.rKanren.case-inf-plus
   (:require
-   [com.pettomato.kanren.rKanren.types :refer [mzero? rdelay? unit? choice?]]
+   [com.pettomato.kanren.rKanren.streams :refer [mzero? rdelay? unit? choice?]]
    [com.pettomato.kanren.rKanren.rank :refer [inc-rank]]))
 
 (defmacro case-inf+
