@@ -4,7 +4,7 @@
    [com.pettomato.kanren.cKanren.streams :refer [unit]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
    [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->prefix oc->rator]]
-   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify-prefix]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify+delta]]
    [com.pettomato.kanren.cKanren.cKanren :refer [subsumes? run-constraints]]
    #+clj
    [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]])
@@ -33,7 +33,7 @@
 
 (defn !=c-NEQ [p]
   (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify-prefix (seq p) s)]
+    (if-let [sp (unify+delta (seq p) s)]
       (let [[s' p'] sp]
         (if (empty? p')
           false
@@ -42,7 +42,7 @@
 
 (defn !=c [u v]
   (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify-prefix (list [u v]) s)]
+    (if-let [sp (unify+delta (list [u v]) s)]
       (let [[s' p] sp]
         ((!=c-NEQ p) pkg))
       pkg)))

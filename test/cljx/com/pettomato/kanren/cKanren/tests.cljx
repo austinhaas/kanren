@@ -17,6 +17,9 @@
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]))
 
+;; Most of these tests were taken from core.logic:
+;; https://github.com/clojure/core.logic/blob/master/src/test/clojure/clojure/core/logic/tests.clj
+
 ;; =============================================================================
 ;; walk*
 

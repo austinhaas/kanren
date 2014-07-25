@@ -1,6 +1,6 @@
 (ns com.pettomato.kanren.cKanren.demo
   (:refer-clojure :exclude [==])
-  #_(:require
+  (:require
    [com.pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq]]
    [com.pettomato.kanren.cKanren.goals :refer [== emptyo conso appendo succeed anyo alwayso]]
    [com.pettomato.kanren.cKanren.disequality-goals :refer [!= membero nonmembero]]

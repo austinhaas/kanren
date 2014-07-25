@@ -1,9 +1,7 @@
 (ns com.pettomato.kanren.cKanren.miniKanren
   (:require
-   [com.pettomato.kanren.cKanren.lvar
-    :refer [lvar? lvar=?]]
-   [com.pettomato.kanren.cKanren.pkg
-    :refer [empty-s ext-s]]
+   [com.pettomato.kanren.cKanren.lvar :refer [lvar? lvar=?]]
+   [com.pettomato.kanren.cKanren.pkg :refer [empty-s ext-s]]
    #+clj
    [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]])
   #+cljs
@@ -27,8 +25,9 @@
   (let [v (walk v s)]
     (cond
      (lvar? v) v
-     (seq? v)  (map #(walk* % s) v)
-     (map? v)  (zipmap (walk* (keys v) s) (walk* (vals v) s))
+     (seq?  v) (map #(walk* % s) v)
+     (map?  v) (zipmap (walk* (keys v) s)
+                       (walk* (vals v) s))
      (coll? v) (into (empty v) (map #(walk* % s) v))
      :else     v)))
 
@@ -39,8 +38,14 @@
      (coll? v) (some #(occurs-check x % s) v)
      :else     false)))
 
-(defn unify-prefix
-  ([e s] (unify-prefix e s empty-s))
+(defn unify+delta
+  "A unification algorithm that takes a sequence of pairs to be
+  unified and a substitution, and attempts to unify each pair in
+  sequence. If successful, returns a pair [s p] where s is the new
+  substitution and p is a partial substitution that contains only the
+  new mappings added by the unification. If each pair cannot be
+  unified, false is returned."
+  ([e s] (unify+delta e s empty-s))
   ([e s p]
      (if (empty? e)
        [s p]
@@ -54,10 +59,10 @@
           (lvar? v)       (and (not (occurs-check v u s))
                                (recur e (ext-s v u s) (ext-s v u p)))
           (and (coll? u)
-               (coll? v)) (let [[u1 & us] u
-                                [v1 & vs] v]
+               (coll? v)) (let [[u1 & us] (seq u)
+                                [v1 & vs] (seq v)]
                             (recur (list* [u1 v1] [us vs] e) s p))
-               :else      false)))))
+          :else           false)))))
 
 (defn unify [u v s]
   (let [u (walk u s)
@@ -79,11 +84,8 @@
 (defn reify-s [v s]
   (let [v (walk v s)]
     (cond
-     (lvar? v)
-     (let [n (reify-name (count s))]
-       (ext-s v n s))
-
-     (and (coll? v) (not (empty? v)))
-     (reify-s (rest v) (reify-s (first v) s))
-
-     :else s)))
+     (lvar? v)               (let [n (reify-name (count s))]
+                               (ext-s v n s))
+     (and (coll? v)
+          (not (empty? v)))  (reify-s (rest v) (reify-s (first v) s))
+     :else                   s)))

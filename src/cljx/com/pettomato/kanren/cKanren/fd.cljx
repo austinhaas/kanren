@@ -95,7 +95,7 @@
        pkg))))
 
 (defn verify-all-bound [c d]
-  ;; This doesn't test NEQ constraints because their operands are a
+  ;; This doesn't test NEQ constraints because their only operand is a
   ;; map, which fails the lvar? test.
   (assert (->> (mapcat oc->rands c)
                (filter lvar?)

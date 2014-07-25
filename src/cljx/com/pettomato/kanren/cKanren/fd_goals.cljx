@@ -18,7 +18,7 @@
    [com.pettomato.kanren.cKanren.fd-implementor :refer [let-fd c-op]]))
 
 (defn domc [x n*]
-  (fn [{:keys [s d c] :as pkg}]
+  (fn [{:keys [s] :as pkg}]
     ((process-fd (walk x s) (make-fd n*)) pkg)))
 
 (defn <=c [u v]

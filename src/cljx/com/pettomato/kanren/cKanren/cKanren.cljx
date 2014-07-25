@@ -3,7 +3,7 @@
    [com.pettomato.kanren.cKanren.lvar :refer [any-relevant-lvar?]]
    [com.pettomato.kanren.cKanren.pkg :refer [empty-s]]
    [com.pettomato.kanren.cKanren.streams :refer [mzero unit choice empty-f]]
-   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify-prefix reify-s]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify+delta reify-s]]
    [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->proc oc->rands]]
    #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]])
@@ -20,9 +20,8 @@
 (defn reify-constraints [m r] (@reify-constraints-impl m r))
 
 (defn subsumes? [p s]
-  (if-let [sp (unify-prefix (seq p) s)]
-    (let [[s' p'] sp]
-      (= s s'))
+  (if-let [sp (unify+delta (seq p) s)]
+    (empty? (second sp))
     false))
 
 (def identity-M identity)
@@ -33,9 +32,9 @@
       (and a (f2 a)))))
 
 (defn rem-run [oc]
-  (fn [{:keys [s d c] :as pkg}]
-    (if (some #(= oc %) c)
-      (let [c' (remove #(= oc %) c)]
+  (fn [{:keys [c] :as pkg}]
+    (if (some #{oc} c)
+      (let [c' (remove #{oc} c)]
         ((oc->proc oc) (assoc pkg :c c')))
       pkg)))
 
@@ -48,7 +47,7 @@
     x*)                   (compose-M (rem-run (first c))
                                      (run-constraints x* (rest c)))
 
-    :else                  (run-constraints x* (rest c))))
+   :else                  (run-constraints x* (rest c))))
 
 (defn goal-construct [f]
   (fn [pkg]

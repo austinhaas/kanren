@@ -4,7 +4,7 @@
    [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
    [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.cKanren.streams :refer [unit mzero]]
-   [com.pettomato.kanren.cKanren.miniKanren :refer [unify-prefix]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [take* unify+delta]]
    [com.pettomato.kanren.cKanren.cKanren :refer [reify-var goal-construct process-prefix]]
    #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])
@@ -14,7 +14,7 @@
 
 (defn ==c [u v]
   (fn [{:keys [s c] :as pkg}]
-    (if-let [sp (unify-prefix (list [u v]) s)]
+    (if-let [sp (unify+delta (list [u v]) s)]
       (let [[s' p] sp]
         (if (empty? p)
           pkg
@@ -60,9 +60,8 @@
 (defn onceo [g] (condu (g)))
 
 (defn trace-lvar [msg v]
-  (assert false)
-  #_(fn [{:keys [s] :as pkg}]
-    (println msg (reify-var v s))
+  (fn [{:keys [s] :as pkg}]
+    (println msg (first (take* ((reify-var v) s))))
     (unit pkg)))
 
 (defn trace-pkg [msg]
