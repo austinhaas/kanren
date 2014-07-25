@@ -1,14 +1,14 @@
 (ns com.pettomato.kanren.cKanren.disequality-goals
   (:refer-clojure :exclude [==])
   (:require
-   [com.pettomato.kanren.cKanren.core :refer [goal-construct process-prefix]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [goal-construct process-prefix]]
    [com.pettomato.kanren.cKanren.goals :refer [== emptyo conso]]
    [com.pettomato.kanren.cKanren.disequality :refer [!=c]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]]))
 
 (defn != [u v] (goal-construct (!=c u v)))
 

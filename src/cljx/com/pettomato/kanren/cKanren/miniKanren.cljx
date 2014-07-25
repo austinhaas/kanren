@@ -1,27 +1,21 @@
-(ns com.pettomato.kanren.cKanren.core
+(ns com.pettomato.kanren.cKanren.miniKanren
   (:require
-   [com.pettomato.kanren.cKanren.streams
-    :refer [mzero unit choice empty-f]]
    [com.pettomato.kanren.cKanren.lvar
-    :refer [lvar? lvar=? any-relevant-lvar?]]
+    :refer [lvar? lvar=?]]
    [com.pettomato.kanren.cKanren.pkg
     :refer [empty-s ext-s]]
-   [com.pettomato.kanren.cKanren.constraints
-    :refer [oc->proc oc->rands]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros
-    :refer [all]])
-  #+cljx
-   [com.pettomato.kanren.cKanren.cKanren-macros
-    :refer [all]])
+   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]])
+  #+cljs
+  (:require-macros
+   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
 
-(def process-prefix-impl      (atom nil))
-(def enforce-constraints-impl (atom nil))
-(def reify-constraints-impl   (atom nil))
-
-(defn process-prefix [p c]    (@process-prefix-impl p c))
-(defn enforce-constraints [x] (@enforce-constraints-impl x))
-(defn reify-constraints [m r] (@reify-constraints-impl m r))
+(defn take* [f]
+  (case-inf (force f)
+            []    ()
+            [f]   (recur f)
+            [a]   (cons a ())
+            [a f] (cons a (lazy-seq (take* f)))))
 
 (defn walk [u s]
   (let [x (get s u ::not-found)]
@@ -79,19 +73,6 @@
                        (and s (unify (rest u) (rest v) s)))
      :else           false)))
 
-(defn subsumes? [p s]
-  (if-let [sp (unify-prefix (seq p) s)]
-    (let [[s' p'] sp]
-      (= s s'))
-    false))
-
-(def identity-M identity)
-
-(defn compose-M [f1 f2]
-  (fn [a]
-    (let [a (f1 a)]
-      (and a (f2 a)))))
-
 (defn reify-name [n]
   (symbol (str "_" "." n)))
 
@@ -106,42 +87,3 @@
      (reify-s (rest v) (reify-s (first v) s))
 
      :else s)))
-
-(defn reify-var [x]
-  (all
-   (enforce-constraints x)
-   (fn [{:keys [s d c] :as pkg}]
-     (choice
-      (let [v (walk* x s)
-            r (reify-s v empty-s)]
-        (cond
-         (empty? r) v
-         :else      (let [v (walk* v r)]
-                      (cond
-                       (empty? c) v
-                       :else      ((reify-constraints v r) pkg)))))
-      empty-f))))
-
-(defn rem-run [oc]
-  (fn [{:keys [s d c] :as pkg}]
-    (if (some #(= oc %) c)
-      (let [c' (remove #(= oc %) c)]
-        ((oc->proc oc) (assoc pkg :c c')))
-      pkg)))
-
-(defn run-constraints [x* c]
-  (cond
-   (empty? c)             identity-M
-
-   (any-relevant-lvar?
-    (oc->rands (first c))
-    x*)                   (compose-M (rem-run (first c))
-                                     (run-constraints x* (rest c)))
-
-    :else                  (run-constraints x* (rest c))))
-
-(defn goal-construct [f]
-  (fn [pkg]
-    (if-let [pkg' (f pkg)]
-      (unit pkg')
-      mzero)))

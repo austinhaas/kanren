@@ -2,17 +2,18 @@
   (:refer-clojure :exclude [== < > <= >= + -])
   (:require
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
-   [com.pettomato.kanren.cKanren.core :refer [walk compose-M goal-construct]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [compose-M goal-construct]]
    [com.pettomato.kanren.cKanren.fd :refer [process-fd make-fd fd-min fd-max fd-singleton? fd-singleton-element fd-disjoint? fd-diff]]
    #+clj
-   [com.pettomato.kanren.cKanren.constraint-macros :refer [build-oc]]
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [all]]
-   [com.pettomato.kanren.cKanren.fd-macros :refer [let-fd c-op]])
+   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
+   [com.pettomato.kanren.cKanren.fd-implementor :refer [let-fd c-op]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.constraint-macros :refer [build-oc]]
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [all]]
-   [com.pettomato.kanren.cKanren.fd-macros :refer [let-fd c-op]]))
+   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
+   [com.pettomato.kanren.cKanren.fd-implementor :refer [let-fd c-op]]))
 
 (alias 'core 'clojure.core)
 

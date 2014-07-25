@@ -1,4 +1,4 @@
-(ns com.pettomato.kanren.cKanren.constraints)
+(ns com.pettomato.kanren.cKanren.constraint-helpers)
 
 (defn oc->proc   [oc] (first oc))
 (defn oc->rator  [oc] (first (rest oc)))

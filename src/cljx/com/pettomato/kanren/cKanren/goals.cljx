@@ -4,12 +4,13 @@
    [com.pettomato.kanren.util.llist :refer [empty-llist lcons]]
    [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.cKanren.streams :refer [unit mzero]]
-   [com.pettomato.kanren.cKanren.core :refer [unify-prefix reify-var goal-construct process-prefix]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [unify-prefix]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [reify-var goal-construct process-prefix]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde condu]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]]))
 
 (defn ==c [u v]
   (fn [{:keys [s c] :as pkg}]

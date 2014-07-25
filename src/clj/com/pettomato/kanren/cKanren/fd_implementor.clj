@@ -1,9 +1,9 @@
-(ns com.pettomato.kanren.cKanren.fd-macros
+(ns com.pettomato.kanren.cKanren.fd-implementor
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [lvar?]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
-   [com.pettomato.kanren.cKanren.core :refer [walk]]
-   [com.pettomato.kanren.cKanren.constraint-macros :refer [build-oc]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
+   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
    [com.pettomato.kanren.cKanren.fd :refer [make-fd get-fd]]))
 
 (defmacro let-fd [[s d] bindings & body]

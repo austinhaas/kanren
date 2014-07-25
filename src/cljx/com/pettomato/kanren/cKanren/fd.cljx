@@ -3,13 +3,14 @@
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [lvar?]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-s ext-d]]
-   [com.pettomato.kanren.cKanren.constraints :refer [oc->rands]]
-   [com.pettomato.kanren.cKanren.core :refer [walk identity-M compose-M run-constraints]]
+   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->rands]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [identity-M compose-M run-constraints]]
    [com.pettomato.kanren.cKanren.goals :refer [succeed fail == onceo]]
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [conde all]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [conde all]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [conde all]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [conde all]]))
 
 (defn map-sum [f]
   (fn step [ls]

@@ -1,4 +1,4 @@
-(ns com.pettomato.kanren.cKanren.cKanren-macros
+(ns com.pettomato.kanren.cKanren.miniKanren-operators
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.cKanren.streams :refer [mzero]]

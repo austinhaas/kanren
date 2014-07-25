@@ -5,26 +5,27 @@
    [clojure.test :refer [is deftest]]
    [com.pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq lcons]]
    [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
+   [com.pettomato.kanren.cKanren.pkg :refer [empty-s ext-s]]
    [com.pettomato.kanren.cKanren.goals :refer
     [== succeed fail emptyo conso firsto resto appendo anyo alwayso onceo]]
    [com.pettomato.kanren.cKanren.disequality-goals
     :refer [!= membero nonmembero]]
    [com.pettomato.kanren.cKanren.fd-goals :as fd]
-   [com.pettomato.kanren.cKanren.pkg :refer [empty-s ext-s]]
-   [com.pettomato.kanren.cKanren.core :refer [walk* compose-M]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk*]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [compose-M]]
    #+clj
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
    #+clj
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all condu]]
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
    #+cljs
    [cemerick.cljs.test])
   #+cljs
   (:require-macros
    [cemerick.cljs.test :refer [is deftest]]
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
-   [com.pettomato.kanren.cKanren.cKanren-macros :refer [fresh conde all condu]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]))
 
-(require '[com.pettomato.kanren.cKanren.core
+(require '[com.pettomato.kanren.cKanren.cKanren
            :refer [process-prefix-impl enforce-constraints-impl reify-constraints-impl]])
 (require '[com.pettomato.kanren.cKanren.fd
            :refer [process-prefix-FD enforce-constraints-FD reify-constraints-FD]])

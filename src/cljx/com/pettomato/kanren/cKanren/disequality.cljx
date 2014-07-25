@@ -3,13 +3,14 @@
    [com.pettomato.kanren.cKanren.lvar :refer [any-lvar? recover-lvars]]
    [com.pettomato.kanren.cKanren.streams :refer [unit]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
-   [com.pettomato.kanren.cKanren.constraints :refer [oc->prefix oc->rator]]
-   [com.pettomato.kanren.cKanren.core :refer [walk* unify-prefix subsumes? run-constraints]]
+   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->prefix oc->rator]]
+   [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify-prefix]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [subsumes? run-constraints]]
    #+clj
-   [com.pettomato.kanren.cKanren.constraint-macros :refer [build-oc]])
+   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]])
   #+cljs
   (:require-macros
-   [com.pettomato.kanren.cKanren.constraint-macros :refer [build-oc]]))
+   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]))
 
 (declare !=c-NEQ)
 
