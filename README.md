@@ -3,20 +3,26 @@
 Implementations of the Kanren family of relational programming
 languages, in Clojure.
 
-These are my personal, work-in-progress adaptations. I've tried to
-keep them simple, and consistent with the source papers, but I've made
-changes to suit Clojure, for personal style, and for runtime
-efficiency.
+These are my personal, work-in-progress implementations.
 
-The cKanren implementation only contains disequality constraints.
+A simple linked-list implementation is included, to emulate Scheme's
+improper lists, which are useful for logic programs. Helper functions
+are provided to convert Clojure sequences to linked-lists and
+vice-versa.
 
-A simple linked list implementation is included, to emulate Scheme's
-improper lists, which are so useful for logic programs. Helper
-functions are provided to convert Clojure sequences to linked lists
-and vice-versa.
+The code has been split, regrettably, into numerous namespaces to
+appease the Clojurescript mandate that confines macros to Clojure
+source files. To make the API more friendly, I've included a namespace,
+cKanren-api, which aggregates most vars.
 
-Clojure data structures are minimally supported: lists, vectors, and
-sets can be walked, but that's about it.
+## Notice
+
+The muKanren and rKanren implementations are likely broken at the
+moment. Originally, I had worked up from muKanren and built each
+implementation on top of the next, but I have since focused on cKanren
+and allowed the other two implementations to languish.
+
+This library has not been extensively tested.
 
 ## Usage
 
