@@ -11,9 +11,9 @@
   (:require-macros
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
 
-(def process-prefix-impl      (atom nil))
-(def enforce-constraints-impl (atom nil))
-(def reify-constraints-impl   (atom nil))
+(defonce process-prefix-impl      (atom nil))
+(defonce enforce-constraints-impl (atom nil))
+(defonce reify-constraints-impl   (atom nil))
 
 (defn process-prefix [p c]    (@process-prefix-impl p c))
 (defn enforce-constraints [x] (@enforce-constraints-impl x))
