@@ -5,7 +5,7 @@
    [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
    [com.pettomato.kanren.cKanren.streams :refer [unit mzero]]
    [com.pettomato.kanren.cKanren.miniKanren :refer [take* unify+delta]]
-   [com.pettomato.kanren.cKanren.cKanren :refer [reify-var goal-construct process-prefix]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [reify-var goal-construct process-delta]]
    #+clj
    [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])
   #+cljs
@@ -14,12 +14,12 @@
 
 (defn ==c [u v]
   (fn [{:keys [s c] :as pkg}]
-    (if-let [sp (unify+delta (list [u v]) s)]
+    (if-let [sp (unify+delta s (list [u v]))]
       (let [[s' p] sp]
         (if (empty? p)
           pkg
           (let [pkg' (assoc pkg :s s')]
-            ((process-prefix p c) pkg'))))
+            ((process-delta p c) pkg'))))
       false)))
 
 (defn == [u v] (goal-construct (==c u v)))

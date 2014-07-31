@@ -12,17 +12,14 @@
    [com.pettomato.kanren.cKanren.disequality :as neq]
    [com.pettomato.kanren.cKanren.disequality-goals :as neq-goals]))
 
-(reset! cK/process-prefix-impl
-        (fn [p c]
-          (cK/compose-M (neq/process-prefix-NEQ p c)
-                        (fd/process-prefix-FD p c))))
-(reset! cK/enforce-constraints-impl
-        (fn [x]
-          (cK/compose-M (neq/enforce-constraints-NEQ x)
-                        (fd/enforce-constraints-FD x))))
-(reset! cK/reify-constraints-impl
-        (fn [m r]
-          (neq/reify-constraints-NEQ m r)))
+(reset! cK/process-delta-impl (fn [p c]
+                                (cK/compose-M (neq/process-delta-NEQ p c)
+                                              (fd/process-delta-FD p c))))
+(reset! cK/enforce-constraints-impl (fn [x]
+                                      (cK/compose-M (neq/enforce-constraints-NEQ x)
+                                                    (fd/enforce-constraints-FD x))))
+(reset! cK/reify-constraints-impl (fn [m r]
+                                    (neq/reify-constraints-NEQ m r)))
 
 (def empty-llist ll/empty-llist)
 (def llist       ll/llist)
@@ -45,6 +42,7 @@
 (def mzero? streams/mzero?)
 
 (def take* mK/take*)
+(def walk  mK/walk)
 (def walk* mK/walk*)
 
 (def reify-var cK/reify-var)

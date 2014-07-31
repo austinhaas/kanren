@@ -21,70 +21,74 @@
                    [(f (first ls))]
                    [(step (rest ls))]))))
 
-(defn fd-value?     [v]    (and (integer? v) (<= 0 v)))
-(defn fd-contains?  [fd v] (boolean (and (fd-value? v) (some #{v} fd))))
-(defn fd-singleton? [fd]   (nil? (next fd)))
+(def non-negative-integer? (every-pred integer? (complement neg?)))
 
-(defn fd-singleton-element [fd] (first fd))
+(def dom-value? non-negative-integer?)
 
-(defn fd-min [fd] (first fd))
-(defn fd-max [fd] (last fd))
+(defn dom-contains? [dom v] (and (dom-value? v) (boolean (some #{v} dom))))
 
-(defn fd-disjoint? [fd-1 fd-2]
+(def dom-singleton? (comp nil? next))
+
+(def dom-singleton-element first)
+
+(def dom-min first)
+(def dom-max last)
+
+(defn dom-disjoint? [d1 d2]
   (cond
-   (or (empty? fd-1) (empty? fd-2)) true
-   (= (first fd-1) (first fd-2))    false
-   (< (first fd-1) (first fd-2))    (recur (rest fd-1) fd-2)
-   :else                            (recur fd-1 (rest fd-2))))
+   (or (empty? d1) (empty? d2)) true
+   (= (first d1) (first d2))    false
+   (< (first d1) (first d2))    (recur (rest d1) d2)
+   :else                        (recur d1 (rest d2))))
 
-(defn fd-diff [fd-1 fd-2]
-  (loop [fd-1 fd-1, fd-2 fd-2, acc []]
+(defn dom-diff [d1 d2]
+  (loop [d1 d1, d2 d2, acc []]
     (cond
-     (or (empty? fd-1) (empty? fd-2)) (into acc fd-1)
-     (= (first fd-1) (first fd-2))    (recur (rest fd-1) (rest fd-2) acc)
-     (< (first fd-1) (first fd-2))    (recur (rest fd-1) fd-2 (conj acc (first fd-1)))
-     :else                            (recur fd-1 (rest fd-2) acc))))
+     (or (empty? d1) (empty? d2)) (into acc d1)
+     (= (first d1) (first d2))    (recur (rest d1) (rest d2) acc)
+     (< (first d1) (first d2))    (recur (rest d1) d2 (conj acc (first d1)))
+     :else                        (recur d1 (rest d2) acc))))
 
-(defn fd-intersection [fd-1 fd-2]
-  (loop [fd-1 fd-1, fd-2 fd-2, acc []]
+(defn dom-intersection [d1 d2]
+  (loop [d1 d1, d2 d2, acc []]
     (cond
-     (or (empty? fd-1) (empty? fd-2)) acc
-     (= (first fd-1) (first fd-2))    (recur (rest fd-1) (rest fd-2) (conj acc (first fd-1)))
-     (< (first fd-1) (first fd-2))    (recur (rest fd-1) fd-2 acc)
-     :else                            (recur fd-1 (rest fd-2) acc))))
+     (or (empty? d1) (empty? d2)) acc
+     (= (first d1) (first d2))    (recur (rest d1) (rest d2) (conj acc (first d1)))
+     (< (first d1) (first d2))    (recur (rest d1) d2 acc)
+     :else                        (recur d1 (rest d2) acc))))
 
-(defn make-fd [n*] n*)
+(defn make-dom [n*] n*)
 
-(defn get-fd [x d] (get d x false))
+(defn get-dom [d x] (get d x false))
 
-(defn resolve-storables [fd x]
+(defn resolve-storables [dom x]
   (fn [{:keys [s d c] :as pkg}]
     (cond
-     (fd-singleton? fd) (let [n    (fd-singleton-element fd)
-                              pkg' (assoc pkg :s (ext-s x n s))]
-                          ((run-constraints (list x) c) pkg'))
-     :else              (assoc pkg :d (ext-d x fd d)))))
+     (dom-singleton? dom) (let [n    (dom-singleton-element dom)
+                                pkg' (update-in pkg [:s] ext-s x n)]
+                            ((run-constraints (list x) c) pkg'))
+     :else                (update-in pkg [:d] ext-d x dom))))
 
-(defn update-var [x fd]
+(defn update-var [x dom]
   (fn [{:keys [s d c] :as pkg}]
-    (if-let [x-fd (get-fd x d)]
-      (let [i (fd-intersection x-fd fd)]
+    (if-let [x-dom (get-dom d x)]
+      (let [i (dom-intersection x-dom dom)]
         (cond
          (empty? i) false
          :else      ((resolve-storables i x) pkg)))
-      ((resolve-storables fd x) pkg))))
+      ((resolve-storables dom x) pkg))))
 
-(defn process-fd [v fd]
+(defn process-dom [v dom]
   (fn [pkg]
     (cond
-     (lvar? v)           ((update-var v fd) pkg)
-     (fd-contains? fd v) pkg
-     :else               false)))
+     (lvar? v)             ((update-var v dom) pkg)
+     (dom-contains? dom v) pkg
+     :else                 false)))
 
 (defn force-ans [x]
   (fn [{:keys [s d c] :as pkg}]
     (let [x (walk x s)
-          y (and (lvar? x) (get-fd x d))]
+          y (and (lvar? x) (get-dom d x))]
       ((cond
         y                      ((map-sum (fn [v] (== x v))) y)
         (and (coll? x)
@@ -102,16 +106,16 @@
                (every? #(contains? d %)))
           "verify-all-bound: Constrained variable without domain."))
 
-(defn process-prefix-FD [p c]
+(defn process-delta-FD [p c]
   (if (empty? p)
     identity-M
     (let [[[x v] & ps] (seq p)
           t (compose-M
              (run-constraints (list x) c)
-             (process-prefix-FD ps c))]
+             (process-delta-FD ps c))]
       (fn [{:keys [s d c] :as pkg}]
-        (if-let [fd (get-fd x d)]
-          ((compose-M (process-fd v fd) t) pkg)
+        (if-let [dom (get-dom d x)]
+          ((compose-M (process-dom v dom) t) pkg)
           (t pkg))))))
 
 (defn enforce-constraints-FD [x]

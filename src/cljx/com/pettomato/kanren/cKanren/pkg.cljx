@@ -7,11 +7,11 @@
 (def empty-d {})
 (def empty-c ())
 
-(defn ext-s [x v s] (assoc s x v))
+(defn ext-s [s x v] (assoc s x v))
 
-(defn ext-d [x fd d] (assoc d x fd))
+(defn ext-d [d x dom] (assoc d x dom))
 
-(defn ext-c [oc c]
+(defn ext-c [c oc]
   (if (any-lvar? (oc->rands oc))
     (conj c oc)
     c))

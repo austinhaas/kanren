@@ -23,7 +23,7 @@
 ;; =============================================================================
 ;; walk*
 
-(defn to-s [v] (reduce (fn [s [k v]] (ext-s k v s)) empty-s v))
+(defn to-s [v] (reduce (fn [s [k v]] (ext-s s k v)) empty-s v))
 
 (deftest test-walk*
   (is (= (let [x  (lvar)

@@ -18,8 +18,7 @@
   (fn [{:keys [c] :as pkg}]
     (loop [c c, c' ()]
       (cond
-       (empty? c)               (let [c'' (ext-c (build-oc !=c-NEQ p) c')]
-                                  (assoc pkg :c c''))
+       (empty? c)               (update-in pkg [:c] ext-c (build-oc !=c-NEQ p))
 
        (= (oc->rator (first c))
           (quote !=c-NEQ))      (let [oc (first c)
@@ -33,7 +32,7 @@
 
 (defn !=c-NEQ [p]
   (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify+delta (seq p) s)]
+    (if-let [sp (unify+delta s (seq p))]
       (let [[s' p'] sp]
         (if (empty? p')
           false
@@ -42,12 +41,12 @@
 
 (defn !=c [u v]
   (fn [{:keys [s] :as pkg}]
-    (if-let [sp (unify+delta (list [u v]) s)]
+    (if-let [sp (unify+delta s (list [u v]))]
       (let [[s' p] sp]
         ((!=c-NEQ p) pkg))
       pkg)))
 
-(defn process-prefix-NEQ [p c]
+(defn process-delta-NEQ [p c]
   (run-constraints (recover-lvars p) c))
 
 (defn enforce-constraints-NEQ [x] unit)

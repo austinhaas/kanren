@@ -31,11 +31,11 @@
      (coll? v) (into (empty v) (map #(walk* % s) v))
      :else     v)))
 
-(defn occurs-check [x v s]
+(defn occurs-check [s x v]
   (let [v (walk v s)]
     (cond
      (lvar? v) (lvar=? v x)
-     (coll? v) (some #(occurs-check x % s) v)
+     (coll? v) (some #(occurs-check s x %) v)
      :else     false)))
 
 (defn unify+delta
@@ -45,47 +45,45 @@
   substitution and p is a partial substitution that contains only the
   new mappings added by the unification. If each pair cannot be
   unified, false is returned."
-  ([e s] (unify+delta e s empty-s))
-  ([e s p]
-     (if (empty? e)
-       [s p]
-       (let [[[u v] & e] e
-             u (walk u s)
-             v (walk v s)]
-         (cond
-          (= u v)         (recur e s p)
-          (lvar? u)       (and (not (occurs-check u v s))
-                               (recur e (ext-s u v s) (ext-s u v p)))
-          (lvar? v)       (and (not (occurs-check v u s))
-                               (recur e (ext-s v u s) (ext-s v u p)))
-          (and (coll? u)
-               (coll? v)) (let [[u1 & us] (seq u)
-                                [v1 & vs] (seq v)]
-                            (recur (list* [u1 v1] [us vs] e) s p))
-          :else           false)))))
+  [s e]
+  (loop [e e, s s, p empty-s]
+    (if (empty? e)
+      [s p]
+      (let [[[u v] & e] e
+            u (walk u s)
+            v (walk v s)]
+        (cond
+         (= u v)         (recur e s p)
+         (lvar? u)       (and (not (occurs-check s u v))
+                              (recur e (ext-s s u v) (ext-s p u v)))
+         (lvar? v)       (and (not (occurs-check s v u))
+                              (recur e (ext-s s v u) (ext-s p v u)))
+         (and (coll? u)
+              (coll? v)) (let [[u1 & us] (seq u)
+                               [v1 & vs] (seq v)]
+                           (recur (list* [u1 v1] [us vs] e) s p))
+              :else           false)))))
 
-(defn unify [u v s]
+(defn unify [s u v]
   (let [u (walk u s)
         v (walk v s)]
     (cond
      (= u v)         s
-     (lvar? u)       (and (not (occurs-check u v s))
-                          (ext-s u v s))
-     (lvar? v)       (and (not (occurs-check v u s))
-                          (ext-s v u s))
+     (lvar? u)       (and (not (occurs-check s u v))
+                          (ext-s s u v))
+     (lvar? v)       (and (not (occurs-check s v u))
+                          (ext-s s v u))
      (and (coll? u)
-          (coll? v)) (let [s (unify (first u) (first v) s)]
-                       (and s (unify (rest u) (rest v) s)))
+          (coll? v)) (let [s (unify s (first u) (first v))]
+                       (and s (unify s (rest u) (rest v))))
      :else           false)))
 
 (defn reify-name [n]
   (symbol (str "_" "." n)))
 
-(defn reify-s [v s]
+(defn reify-s [s v]
   (let [v (walk v s)]
     (cond
-     (lvar? v)               (let [n (reify-name (count s))]
-                               (ext-s v n s))
-     (and (coll? v)
-          (not (empty? v)))  (reify-s (rest v) (reify-s (first v) s))
-     :else                   s)))
+     (lvar? v) (ext-s s v (reify-name (count s)))
+     (coll? v) (reduce reify-s s v)
+     :else     s)))
