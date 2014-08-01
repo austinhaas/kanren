@@ -3,7 +3,7 @@
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [lvar?]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-s ext-d]]
-   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->rands]]
+   [com.pettomato.kanren.cKanren.oc :refer [oc->rands]]
    [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
    [com.pettomato.kanren.cKanren.cKanren :refer [identity-M compose-M run-constraints]]
    [com.pettomato.kanren.cKanren.goals :refer [succeed fail == onceo]]

@@ -3,7 +3,7 @@
    [com.pettomato.kanren.cKanren.lvar :refer [any-lvar? recover-lvars]]
    [com.pettomato.kanren.cKanren.streams :refer [unit]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
-   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->delta oc->rator]]
+   [com.pettomato.kanren.cKanren.oc :refer [oc->delta oc->rator]]
    [com.pettomato.kanren.cKanren.miniKanren :refer [walk* unify+delta]]
    [com.pettomato.kanren.cKanren.cKanren :refer [subsumes? run-constraints]]
    #+clj

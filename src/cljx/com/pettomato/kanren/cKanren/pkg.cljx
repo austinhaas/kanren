@@ -1,7 +1,7 @@
 (ns com.pettomato.kanren.cKanren.pkg
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [any-lvar?]]
-   [com.pettomato.kanren.cKanren.constraint-helpers :refer [oc->rands]]))
+   [com.pettomato.kanren.cKanren.oc :refer [oc->rands]]))
 
 (def empty-s {})
 (def empty-d {})
