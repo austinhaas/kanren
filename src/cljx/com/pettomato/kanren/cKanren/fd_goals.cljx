@@ -1,11 +1,11 @@
 (ns com.pettomato.kanren.cKanren.fd-goals
-  (:refer-clojure :exclude [== < > <= >= + -])
+  (:refer-clojure :exclude [== < > <= >= + - distinct])
   (:require
    [com.pettomato.kanren.cKanren.lvar :refer [lvar?]]
    [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
    [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
-   [com.pettomato.kanren.cKanren.cKanren :refer [compose-M goal-construct]]
-   [com.pettomato.kanren.cKanren.fd :refer [process-dom make-dom dom-min dom-max dom-singleton? dom-singleton-element dom-disjoint? dom-diff]]
+   [com.pettomato.kanren.cKanren.cKanren :refer [identity-M compose-M goal-construct]]
+   [com.pettomato.kanren.cKanren.fd :refer [process-dom make-dom dom-min dom-max dom-singleton? dom-singleton-element dom-disjoint? dom-diff get-dom dom-contains?]]
    #+clj
    [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
    #+clj
@@ -57,21 +57,49 @@
                                                       (dom-singleton? vd) ((process-dom u (dom-diff ud vd)) pkg')
                                                       :else               pkg'))))))
 
-#_(defn all-diff-slash-c [y* n*]
-  (fn [{:keys [s d c] :as pkg}]
-    ))
+(defn- exclude-from-dom [d d1 x*]
+  (letfn [(step [x*]
+            (cond
+             (empty? x*) identity-M
+             :else       (if-let [d2 (get-dom d (first x*))]
+                           (compose-M
+                            (process-dom (first x*) (dom-diff d2 d1))
+                            (step (rest x*)))
+                           (step (rest x*)))))]
+    (step x*)))
 
-#_(defn all-diff-c [v*]
+(defn- list-insert [pred l x]
+  (cond
+   (empty? l)         (list x)
+   (pred x (first l)) (cons x l)
+   :else              (cons (first l) (list-insert pred (rest l) x))))
+
+(defn all-diff%c [y* n*]
   (fn [{:keys [s d c] :as pkg}]
-    (let [v (walk v* s)]
+    (loop [y* y*, n* n*, x* (list)]
       (cond
-       (lvar? v*) (let [oc (build-oc all-diff-c v*)]
-                    (assoc pkg :c (ext-c oc c)))
+       (empty? y*) (let [oc   (build-oc all-diff%c x* n*)
+                         pkg' (update-in pkg [:c] ext-c oc)]
+                     ((exclude-from-dom d (make-dom n*) x*) pkg'))
+       :else       (let [y (walk (first y*) s)]
+                     (cond
+                      (lvar? y)            (recur (rest y*) n* (conj x* y))
+                      (dom-contains? n* y) false
+                      :else                (let [n* (list-insert clojure.core/< n* y)]
+                                             (recur (rest y*) n* x*))))))))
+
+(defn all-diff-c [v*]
+  (fn [{:keys [s d c] :as pkg}]
+    (let [v* (walk v* s)]
+      (cond
+       (lvar? v*) (update-in pkg [:c] ext-c (build-oc all-diff-c v*))
        :else      (let [{x* true n* false} (group-by lvar? v*)
                         n* (sort clojure.core/< n*)]
                     (cond
-                     (list-sorted? < n*) ((all-diff-slash-c x* n*) pkg)
-                     :else               false))))))
+                     ;; Make sure all vals are different.
+                     (or (empty? n*)
+                         (apply clojure.core/< n*)) ((all-diff%c x* n*) pkg)
+                     :else                          false))))))
 
 (defn dom [x n*]  (goal-construct (domc x n*)))
 (defn !=  [u v]   (goal-construct (!=c u v)))
@@ -83,4 +111,4 @@
 (defn +   [u v w] (goal-construct (+c u v w)))
 (defn -   [u v w] (+ v w u))
 
-#_(defn all-diff [v*] (goal-construct (all-diff-c v*)))
+(defn distinct [v*] (goal-construct (all-diff-c v*)))

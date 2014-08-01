@@ -10,12 +10,15 @@
    #+clj
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
    #+clj
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]])
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
+   #+clj
+   [com.pettomato.kanren.cKanren.in-dom :refer [in-dom]])
   #+cljs
   (:require-macros
    [cemerick.cljs.test :refer [is deftest]]
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]))
+   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
+   [com.pettomato.kanren.cKanren.in-dom :refer [in-dom]]))
 
 ;; Most of these tests were taken from core.logic:
 ;; https://github.com/clojure/core.logic/blob/master/src/test/clojure/clojure/core/logic/tests.clj
@@ -639,5 +642,224 @@
             [(== false q) succeed]
             [fail]))
          '(false))))
+
+(deftest test-arch-friends-problem-logic-124
+  (let [expected [{:wedges 2,
+                    :flats 4,
+                    :pumps 1,
+                    :sandals 3,
+                    :foot-farm 2,
+                    :heels-in-a-hand-cart 4,
+                    :shoe-palace 1,
+                    :tootsies 3}]]
+    (is (= expected
+           (run* [q]
+             (fresh [wedges flats pumps sandals
+                     ff hh sp tt pumps+1]
+               (in-dom wedges flats pumps sandals
+                       ff hh sp tt pumps+1 (range 1 5))
+               (fd/distinct [wedges flats pumps sandals])
+               (fd/distinct [ff hh sp tt])
+               (== flats hh)
+               (fd/+ pumps 1 pumps+1)
+               (fd/!= pumps+1 tt)
+               (== ff 2)
+               (fd/+ sp 2 sandals)
+               (== q {:wedges wedges
+                      :flats flats
+                      :pumps pumps
+                      :sandals sandals
+                      :foot-farm ff
+                      :heels-in-a-hand-cart hh
+                      :shoe-palace sp
+                      :tootsies tt})))))))
+
+;;; cKanren
+
+(deftest test-ckanren-1
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x]
+               (in-dom x (range 1 4))
+               (== q x))))
+         (into #{} '(1 2 3)))))
+
+(deftest test-ckanren-2
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y z]
+               (in-dom x z (range 1 6))
+               (in-dom y (range 3 6))
+               (fd/+ x y z)
+               (== q [x y z]))))
+         (into #{} '([1 3 4] [2 3 5] [1 4 5])))))
+
+(deftest test-ckanren-3
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y]
+               (in-dom x y (range 1 4))
+               (== x y)
+               (== q [x y]))))
+         (into #{} '([1 1] [2 2] [3 3])))))
+
+(deftest test-ckanren-4
+  (is (true?
+       (every? (fn [[x y]] (not= x y))
+         (run* [q]
+           (fresh [x y]
+             (in-dom x y (range 1 10))
+             (fd/!= x y)
+             (== q [x y])))))))
+
+(deftest test-ckanren-5
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y]
+               (in-dom x y (range 1 4))
+               (== x 2)
+               (fd/!= x y)
+               (== q [x y]))))
+         (into #{} '([2 1] [2 3])))))
+
+(deftest test-ckanren-6
+  (is (= (run* [q]
+           (fresh [x]
+             (in-dom x (range 1 3))
+             (fd/+ x 1 x)
+             (== q x)))
+         '())))
+
+(deftest test-ckanren-7
+  (is (= (run* [q]
+           (fresh [x]
+             (in-dom x (range 1 3))
+             (fd/+ x x x)))
+         '())))
+
+(deftest test-ckanren-8
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y]
+               (in-dom x y (range 1 4))
+               (fd/<= x y)
+               (== q [x y]))))
+         (into #{} '([1 1] [1 2] [2 2] [1 3] [3 3] [2 3])))))
+
+(deftest test-ckanren-9
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y]
+               (in-dom x y (range 1 4))
+               (fd/< x y)
+               (== q [x y]))))
+         (into #{} '([1 2] [2 3] [1 3])))))
+
+(defn subgoal [x]
+  (fresh [y]
+    (== y x)
+    (fd/+ 1 y 3)))
+
+(deftest test-ckanren-10
+  (is (= (run* [q]
+           (fresh [x]
+             (in-dom x (range 1 10))
+             (subgoal x)
+             (== q x)))
+         '(2))))
+
+(deftest test-distinct
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y z]
+               (in-dom x y z (range 1 4))
+               (fd/distinct [x y z])
+               (== q [x y z]))))
+         (into #{} '([1 2 3] [1 3 2] [2 1 3] [2 3 1] [3 1 2] [3 2 1])))))
+
+(deftest test-=fd-2
+  (is (= (into #{}
+           (run* [q]
+             (fresh [a b]
+               (in-dom a b (range 1 4))
+               (== a b)
+               (== q [a b]))))
+         (into #{} '([1 1] [2 2] [3 3])))))
+
+(deftest test-fd-!=-1
+  (is (= (into #{}
+           (run* [q]
+             (fresh [a b]
+               (in-dom a b (range 1 4))
+               (fd/!= a b)
+               (== q [a b]))))
+         (into #{} '([1 2] [1 3] [2 1] [2 3] [3 1] [3 2])))))
+
+(deftest test-fd-<-1
+  (is (= (into #{}
+           (run* [q]
+             (fresh [a b c]
+               (in-dom a b c (range 1 4))
+               (fd/< a b) (fd/< b c)
+               (== q [a b c]))))
+         (into #{} '([1 2 3])))))
+
+(deftest test-fd-<-2
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y z]
+               (in-dom x y z (range 1 11))
+               (fd/+ x y z)
+               (fd/< x y)
+               (== z 10)
+               (== q [x y z]))))
+         (into #{} '([1 9 10] [2 8 10] [3 7 10] [4 6 10])))))
+
+(deftest test-fd->-1
+  (is (= (into #{}
+           (run* [q]
+             (fresh [x y z]
+               (in-dom x y z (range 1 11))
+               (fd/+ x y z)
+               (fd/> x y)
+               (== z 10)
+               (== q [x y z]))))
+         (into #{} '([6 4 10] [7 3 10] [8 2 10] [9 1 10])))))
+
+(deftest test-logic-62-fd
+  (is (= (run 1 [q]
+           (fresh [x y a b]
+             (fd/distinct [x y])
+             (== [x y] [a b])
+             (== q [a b])
+             (== a 1)
+             (== b 1)))
+         ()))
+  (is (= (run 1 [q]
+           (fresh [x y a b]
+             (== [x y] [a b])
+             (== q [a b])
+             (== a 1)
+             (== b 1)
+             (fd/distinct [x y])))
+         ())))
+
+(deftest test-logic-81-fd
+  (is (= (run* [q]
+           (fresh [x y]
+             (== q x)
+             (fd/distinct [q y])
+             (== y x)
+             (in-dom q x y (range 1 4))))
+        ()))
+  (is (= (run* [q]
+           (fresh [x y z]
+             (== q x)
+             (== y z)
+             (fd/distinct [q y])
+             (fd/distinct [q x])
+             (== z q)
+             (in-dom q x y z (range 1 3))))
+        ())))
 
 #_(clojure.test/run-tests)
