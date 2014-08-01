@@ -1,4 +1,4 @@
-(defproject com.pettomato/kanren "0.1.2-SNAPSHOT"
+(defproject com.pettomato/kanren "0.1.3-SNAPSHOT"
   :description "Clojure implementations of the Kanren family of relational programming languages."
   :url "https://github.com/austinhaas/kanren"
   :license {:name "Eclipse Public License"
