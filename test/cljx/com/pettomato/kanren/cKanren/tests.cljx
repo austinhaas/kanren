@@ -5,7 +5,7 @@
    [clojure.test :refer [is deftest]]
    #+cljs
    [cemerick.cljs.test]
-   [com.pettomato.kanren.cKanren.cKanren-api :refer [empty-llist llist llist* llist->seq lcons lvar lvar? lvar=? empty-pkg empty-s ext-s unit mzero choice unit? mzero? take* walk* reify-var == succeed fail emptyo conso firsto resto appendo anyo alwayso onceo trace-lvar trace-pkg trace-s log != membero nonmembero]]
+   [com.pettomato.kanren.cKanren.cKanren-api :refer [empty-llist llist llist* llist->seq lcons lvar lvar? lvar=? empty-pkg empty-s ext-s unit mzero choice unit? mzero? take* walk* walk reify-var == succeed fail emptyo conso firsto resto appendo anyo alwayso onceo trace-lvar trace-pkg trace-s log != membero nonmembero]]
    [com.pettomato.kanren.cKanren.fd-goals :as fd]
    #+clj
    [com.pettomato.kanren.cKanren.run :refer [run* run]]
@@ -27,6 +27,19 @@
 ;; walk*
 
 (defn to-s [v] (reduce (fn [s [k v]] (ext-s s k v)) empty-s v))
+
+(deftest test-basic-walk
+  (is (= (let [x  (lvar)
+               y  (lvar)
+               ss (to-s [[x 5] [y x]])]
+           (walk y ss))
+         5)))
+
+(deftest test-deep-walk
+  (is (= (let [[x y z c b a :as s] (repeatedly lvar)
+               ss (to-s [[x 5] [y x] [z y] [c z] [b c] [a b]])]
+           (walk a ss))
+         5)))
 
 (deftest test-walk*
   (is (= (let [x  (lvar)
