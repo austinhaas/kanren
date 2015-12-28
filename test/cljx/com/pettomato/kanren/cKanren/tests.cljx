@@ -875,4 +875,47 @@
              (in-dom q x y z (range 1 3))))
         ())))
 
+
+(defn righto [x y l]
+  (conde
+    [(fresh [d]
+       (conso x d l)
+       (firsto d y))]
+    [(fresh [d]
+       (resto l d)
+       (righto x y d))]))
+
+(defn nexto [x y l]
+  (conde
+    ((righto x y l))
+    ((righto y x l))))
+
+(defn membero1 [x l]
+  (fresh [head tail]
+    (conso head tail l)
+    (conde
+      [(== x head)]
+      [(membero1 x tail)])))
+
+(defn zebrao [hs]
+  (all
+   (== (llist [(lvar) (lvar) [(lvar) (lvar) 'milk (lvar) (lvar)] (lvar) (lvar)]) hs)
+   (firsto hs ['norwegian (lvar) (lvar) (lvar) (lvar)])
+   (nexto ['norwegian (lvar) (lvar) (lvar) (lvar)] [(lvar) (lvar) (lvar) (lvar) 'blue] hs)
+   (righto [(lvar) (lvar) (lvar) (lvar) 'ivory] [(lvar) (lvar) (lvar) (lvar) 'green] hs)
+   (membero1 ['englishman (lvar) (lvar) (lvar) 'red] hs)
+   (membero1 [(lvar) 'kools (lvar) (lvar) 'yellow] hs)
+   (membero1 ['spaniard (lvar) (lvar) 'dog (lvar)] hs)
+   (membero1 [(lvar) (lvar) 'coffee (lvar) 'green] hs)
+   (membero1 ['ukrainian (lvar) 'tea (lvar) (lvar)] hs)
+   (membero1 [(lvar) 'lucky-strikes 'oj (lvar) (lvar)] hs)
+   (membero1 ['japanese 'parliaments (lvar) (lvar) (lvar)] hs)
+   (membero1 [(lvar) 'oldgolds (lvar) 'snails (lvar)] hs)
+   (nexto [(lvar) (lvar) (lvar) 'horse (lvar)] [(lvar) 'kools (lvar) (lvar) (lvar)] hs)
+   (nexto [(lvar) (lvar) (lvar) 'fox (lvar)] [(lvar) 'chesterfields (lvar) (lvar) (lvar)] hs)))
+
+#_(run 1 [q] (zebrao q))
+
+#_(dotimes [_ 100] (time (doall (run 1 [q] (zebrao q)))))
+
 #_(clojure.test/run-tests)
