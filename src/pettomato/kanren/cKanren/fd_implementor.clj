@@ -1,10 +1,10 @@
-(ns com.pettomato.kanren.cKanren.fd-implementor
+(ns pettomato.kanren.cKanren.fd-implementor
   (:require
-   [com.pettomato.kanren.cKanren.lvar :refer [lvar?]]
-   [com.pettomato.kanren.cKanren.pkg :refer [ext-c]]
-   [com.pettomato.kanren.cKanren.miniKanren :refer [walk]]
-   [com.pettomato.kanren.cKanren.build-oc :refer [build-oc]]
-   [com.pettomato.kanren.cKanren.fd :refer [make-dom get-dom]]))
+   [pettomato.kanren.cKanren.lvar :refer [lvar?]]
+   [pettomato.kanren.cKanren.pkg :refer [ext-c]]
+   [pettomato.kanren.cKanren.miniKanren :refer [walk]]
+   [pettomato.kanren.cKanren.build-oc :refer [build-oc]]
+   [pettomato.kanren.cKanren.fd :refer [make-dom get-dom]]))
 
 (defmacro let-dom [[s d] bindings & body]
   `(let [~@(apply concat

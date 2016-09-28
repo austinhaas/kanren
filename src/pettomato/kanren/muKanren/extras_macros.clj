@@ -1,8 +1,8 @@
-(ns com.pettomato.kanren.muKanren.extras-macros
+(ns pettomato.kanren.muKanren.extras-macros
   (:refer-clojure :exclude [conj disj])
   (:require
-   [com.pettomato.kanren.muKanren.operators :refer [conj disj]]
-   [com.pettomato.kanren.muKanren.extras :refer [call:fresh mK-reify take* call:empty-pkg]]))
+   [pettomato.kanren.muKanren.operators :refer [conj disj]]
+   [pettomato.kanren.muKanren.extras :refer [call:fresh mK-reify take* call:empty-pkg]]))
 
 (defmacro Zzz [g]
   `(fn [a#]

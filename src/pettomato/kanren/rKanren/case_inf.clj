@@ -1,6 +1,6 @@
-(ns com.pettomato.kanren.rKanren.case-inf
+(ns pettomato.kanren.rKanren.case-inf
   (:require
-   [com.pettomato.kanren.rKanren.streams :refer [mzero? rdelay? unit? choice?]]))
+   [pettomato.kanren.rKanren.streams :refer [mzero? rdelay? unit? choice?]]))
 
 (defmacro case-inf
   [e _ e0 [f'] e1 [a'] e2 [a f] e3]

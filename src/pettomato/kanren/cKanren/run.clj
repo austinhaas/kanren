@@ -1,9 +1,9 @@
-(ns com.pettomato.kanren.cKanren.run
+(ns pettomato.kanren.cKanren.run
   (:require
-   [com.pettomato.kanren.cKanren.pkg :refer [empty-pkg]]
-   [com.pettomato.kanren.cKanren.miniKanren :refer [take*]]
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [fresh]]
-   [com.pettomato.kanren.cKanren.cKanren :refer [reify-var]]))
+   [pettomato.kanren.cKanren.pkg :refer [empty-pkg]]
+   [pettomato.kanren.cKanren.miniKanren :refer [take*]]
+   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh]]
+   [pettomato.kanren.cKanren.cKanren :refer [reify-var]]))
 
 (defmacro run* [[v & vars] & gs]
   `(take*

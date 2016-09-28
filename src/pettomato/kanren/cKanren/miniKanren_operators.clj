@@ -1,9 +1,9 @@
-(ns com.pettomato.kanren.cKanren.miniKanren-operators
+(ns pettomato.kanren.cKanren.miniKanren-operators
   (:require
-   [com.pettomato.kanren.cKanren.lvar :refer [lvar]]
-   [com.pettomato.kanren.cKanren.streams :refer [mzero]]
-   [com.pettomato.kanren.cKanren.operators :refer [mplus bind]]
-   [com.pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
+   [pettomato.kanren.cKanren.lvar :refer [lvar]]
+   [pettomato.kanren.cKanren.streams :refer [mzero]]
+   [pettomato.kanren.cKanren.operators :refer [mplus bind]]
+   [pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
 
 (defmacro mplus*
   ([e] e)

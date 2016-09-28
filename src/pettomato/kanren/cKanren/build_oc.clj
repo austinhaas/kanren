@@ -1,4 +1,4 @@
-(ns com.pettomato.kanren.cKanren.build-oc)
+(ns pettomato.kanren.cKanren.build-oc)
 
 (defmacro build-oc [op & args]
   (let [vars (repeatedly (count args) gensym)]

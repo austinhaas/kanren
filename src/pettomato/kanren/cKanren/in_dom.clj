@@ -1,7 +1,7 @@
-(ns com.pettomato.kanren.cKanren.in-dom
+(ns pettomato.kanren.cKanren.in-dom
   (:require
-   [com.pettomato.kanren.cKanren.fd-goals :refer [dom]]
-   [com.pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
+   [pettomato.kanren.cKanren.fd-goals :refer [dom]]
+   [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
 
 (defmacro in-dom [& args]
   (let [e    (last args)

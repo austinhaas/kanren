@@ -1,6 +1,6 @@
-(ns com.pettomato.kanren.muKanren.core-macros
+(ns pettomato.kanren.muKanren.core-macros
   (:require
-   [com.pettomato.kanren.muKanren.types :refer [mzero? unit?]]))
+   [pettomato.kanren.muKanren.types :refer [mzero? unit?]]))
 
 (defmacro case-inf
   [e _ e0 [f'] e1 [a'] e2 [a f] e3]

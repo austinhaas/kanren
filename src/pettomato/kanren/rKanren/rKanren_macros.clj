@@ -1,10 +1,10 @@
-(ns com.pettomato.kanren.rKanren.rKanren-macros
+(ns pettomato.kanren.rKanren.rKanren-macros
   (:require
-   [com.pettomato.kanren.rKanren.lvar :refer [lvar]]
-   [com.pettomato.kanren.rKanren.rank :refer [get-rank min-rank inc-rank]]
-   [com.pettomato.kanren.cKanren.cKanren-api :refer [reify-var]]
-   [com.pettomato.kanren.rKanren.rKanren :refer [mplus bind take* empty-pkg]]
-   [com.pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
+   [pettomato.kanren.rKanren.lvar :refer [lvar]]
+   [pettomato.kanren.rKanren.rank :refer [get-rank min-rank inc-rank]]
+   [pettomato.kanren.cKanren.cKanren-api :refer [reify-var]]
+   [pettomato.kanren.rKanren.rKanren :refer [mplus bind take* empty-pkg]]
+   [pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
 
 (defmacro mplus*
   ([e] e)
