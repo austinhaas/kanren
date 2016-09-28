@@ -5,11 +5,11 @@
    [pettomato.kanren.cKanren.streams :refer [mzero unit choice empty-f]]
    [pettomato.kanren.cKanren.miniKanren :refer [walk* unify+delta reify-s]]
    [pettomato.kanren.cKanren.oc :refer [oc->proc oc->rands]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [all]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [all]])))
 
 (defonce process-delta-impl       (atom nil))
 (defonce enforce-constraints-impl (atom nil))

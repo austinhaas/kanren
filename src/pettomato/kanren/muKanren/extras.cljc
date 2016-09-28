@@ -2,11 +2,11 @@
   (:require
    [pettomato.kanren.muKanren.types :refer [lvar lvar?]]
    [pettomato.kanren.muKanren.core :refer [empty-s ext-s walk]]
-   #+clj
-   [pettomato.kanren.muKanren.core-macros :refer [case-inf]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.muKanren.core-macros :refer [case-inf]]))
+   #?(:clj
+      [pettomato.kanren.muKanren.core-macros :refer [case-inf]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.muKanren.core-macros :refer [case-inf]])))
 
 (defn call:fresh [f]
   (fn [{:keys [i] :as pkg}]
@@ -35,8 +35,8 @@
     (cond
      (lvar? v) v
      (seq? v) (map #(walk* % s) v)
-     #+clj (instance? clojure.lang.MapEntry v) #+clj (into [] (map #(walk* % s) v))
-     #+cljs (satisfies? IMapEntry v) #+cljs (into [] (map #(walk* % s) v))
+     #?(:clj (instance? clojure.lang.MapEntry v)) #?(:clj (into [] (map #(walk* % s) v)))
+     #?(:cljs (satisfies? IMapEntry v)) #?(:cljs (into [] (map #(walk* % s) v)))
      (coll? v) (into (empty v) (map #(walk* % s) v))
      :else v)))
 

@@ -2,11 +2,11 @@
   (:refer-clojure :exclude [== conj disj])
   (:require
    [pettomato.kanren.cKanren.streams :refer [mzero unit choice]]
-   #+clj
-   [pettomato.kanren.cKanren.case-inf :refer [case-inf]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.case-inf :refer [case-inf]])))
 
 (defn mplus [a-inf f]
   (case-inf a-inf

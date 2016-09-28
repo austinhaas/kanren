@@ -1,17 +1,13 @@
 (ns pettomato.kanren.cKanren.demo
   (:refer-clojure :exclude [==])
   (:require
-   [pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq]]
-   [pettomato.kanren.cKanren.goals :refer [== emptyo conso appendo succeed anyo alwayso]]
-   [pettomato.kanren.cKanren.disequality-goals :refer [!= membero nonmembero]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]
-   #+clj
-   [pettomato.kanren.cKanren.run :refer [run* run]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]
-   [pettomato.kanren.cKanren.run :refer [run* run]]))
+   [pettomato.kanren.cKanren.cKanren-api :refer :all]
+   #?(:clj [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]])
+   #?(:clj [pettomato.kanren.cKanren.run :refer [run* run]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]
+      [pettomato.kanren.cKanren.run :refer [run* run]])))
 
 #_(take 5
         (run* [q]

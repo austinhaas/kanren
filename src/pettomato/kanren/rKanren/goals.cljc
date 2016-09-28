@@ -4,11 +4,11 @@
    [pettomato.kanren.util.llist :refer [empty-llist lcons]]
    [pettomato.kanren.cKanren.cKanren-api :as c]
    [pettomato.kanren.rKanren.streams :refer [unit mzero]]
-   #+clj
-   [pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]]))
+   #?(:clj
+      [pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.rKanren.rKanren-macros :refer [fresh conde]])))
 
 (def == c/==)
 (def != c/!=)

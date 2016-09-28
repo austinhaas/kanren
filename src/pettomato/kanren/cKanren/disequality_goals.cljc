@@ -4,11 +4,11 @@
    [pettomato.kanren.cKanren.cKanren :refer [goal-construct]]
    [pettomato.kanren.cKanren.goals :refer [== emptyo conso]]
    [pettomato.kanren.cKanren.disequality :refer [!=c]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde]])))
 
 (defn != [u v] (goal-construct (!=c u v)))
 

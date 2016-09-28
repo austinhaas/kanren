@@ -1,24 +1,17 @@
 (ns pettomato.kanren.cKanren.tests
   (:refer-clojure :exclude [==])
   (:require
-   #+clj
    [clojure.test :refer [is deftest]]
-   #+cljs
-   [cemerick.cljs.test]
    [pettomato.kanren.cKanren.cKanren-api :refer [empty-llist llist llist* llist->seq lcons lvar lvar? lvar=? empty-pkg empty-s ext-s unit mzero choice unit? mzero? take* walk* walk reify-var == succeed fail emptyo conso firsto resto appendo anyo alwayso onceo trace-lvar trace-pkg trace-s log != membero nonmembero]]
    [pettomato.kanren.cKanren.fd-goals :as fd]
-   #+clj
-   [pettomato.kanren.cKanren.run :refer [run* run]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
-   #+clj
-   [pettomato.kanren.cKanren.in-dom :refer [in-dom]])
-  #+cljs
-  (:require-macros
-   [cemerick.cljs.test :refer [is deftest]]
-   [pettomato.kanren.cKanren.run :refer [run* run]]
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
-   [pettomato.kanren.cKanren.in-dom :refer [in-dom]]))
+   #?(:clj [pettomato.kanren.cKanren.run :refer [run* run]])
+   #?(:clj [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]])
+   #?(:clj [pettomato.kanren.cKanren.in-dom :refer [in-dom]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.run :refer [run* run]]
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde all condu]]
+      [pettomato.kanren.cKanren.in-dom :refer [in-dom]])))
 
 ;; Most of these tests were taken from core.logic:
 ;; https://github.com/clojure/core.logic/blob/master/src/test/clojure/clojure/core/logic/tests.clj

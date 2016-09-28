@@ -6,11 +6,11 @@
    [pettomato.kanren.muKanren.operators :refer [disj]] ; This is needed, b/c conde expands to disj.
    [pettomato.kanren.muKanren.extras :refer [reify-var]]
    [pettomato.kanren.muKanren.core :refer [unify]]
-   #+clj
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde]]))
+   #?(:clj
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde]])))
 
 (defn == [u v]
   (fn [{:keys [s] :as pkg}]

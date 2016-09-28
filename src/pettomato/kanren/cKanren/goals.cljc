@@ -6,11 +6,11 @@
    [pettomato.kanren.cKanren.streams :refer [unit mzero]]
    [pettomato.kanren.cKanren.miniKanren :refer [take* unify+delta]]
    [pettomato.kanren.cKanren.cKanren :refer [reify-var goal-construct process-delta]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [fresh conde condu]])))
 
 (defn ==c [u v]
   (fn [{:keys [s c] :as pkg}]

@@ -6,11 +6,11 @@
    [pettomato.kanren.cKanren.oc :refer [oc->delta oc->rator]]
    [pettomato.kanren.cKanren.miniKanren :refer [walk* unify+delta]]
    [pettomato.kanren.cKanren.cKanren :refer [subsumes? run-constraints]]
-   #+clj
-   [pettomato.kanren.cKanren.build-oc :refer [build-oc]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.build-oc :refer [build-oc]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.build-oc :refer [build-oc]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.build-oc :refer [build-oc]])))
 
 (declare !=c-NEQ)
 

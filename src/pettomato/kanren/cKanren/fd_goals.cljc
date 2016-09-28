@@ -6,17 +6,14 @@
    [pettomato.kanren.cKanren.miniKanren :refer [walk]]
    [pettomato.kanren.cKanren.cKanren :refer [identity-M compose-M goal-construct]]
    [pettomato.kanren.cKanren.fd :refer [process-dom make-dom dom-min dom-max dom-singleton? dom-singleton-element dom-disjoint? dom-diff get-dom dom-contains?]]
-   #+clj
-   [pettomato.kanren.cKanren.build-oc :refer [build-oc]]
-   #+clj
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
-   #+clj
-   [pettomato.kanren.cKanren.fd-implementor :refer [let-dom c-op]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.build-oc :refer [build-oc]]
-   [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
-   [pettomato.kanren.cKanren.fd-implementor :refer [let-dom c-op]]))
+   #?(:clj [pettomato.kanren.cKanren.build-oc :refer [build-oc]])
+   #?(:clj [pettomato.kanren.cKanren.miniKanren-operators :refer [all]])
+   #?(:clj [pettomato.kanren.cKanren.fd-implementor :refer [let-dom c-op]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.build-oc :refer [build-oc]]
+      [pettomato.kanren.cKanren.miniKanren-operators :refer [all]]
+      [pettomato.kanren.cKanren.fd-implementor :refer [let-dom c-op]])))
 
 (defn domc [x n*]
   (fn [{:keys [s] :as pkg}]

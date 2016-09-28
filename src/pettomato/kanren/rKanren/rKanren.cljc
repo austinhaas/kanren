@@ -3,17 +3,14 @@
    [pettomato.kanren.rKanren.pkg :as pkg]
    [pettomato.kanren.rKanren.streams :refer [mzero choice]]
    [pettomato.kanren.rKanren.rank :refer [set-rank get-rank]]
-   #+clj
-   [pettomato.kanren.rKanren.case-inf :refer [case-inf]]
-   #+clj
-   [pettomato.kanren.rKanren.case-inf-plus :refer [case-inf+]]
-   #+clj
-   [pettomato.kanren.rKanren.rdelay :refer [rdelay]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.rKanren.case-inf :refer [case-inf]]
-   [pettomato.kanren.rKanren.case-inf-plus :refer [case-inf+]]
-   [pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
+   #?(:clj [pettomato.kanren.rKanren.case-inf :refer [case-inf]])
+   #?(:clj [pettomato.kanren.rKanren.case-inf-plus :refer [case-inf+]])
+   #?(:clj [pettomato.kanren.rKanren.rdelay :refer [rdelay]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.rKanren.case-inf :refer [case-inf]]
+      [pettomato.kanren.rKanren.case-inf-plus :refer [case-inf+]]
+      [pettomato.kanren.rKanren.rdelay :refer [rdelay]])))
 
 (defn rforce [a-inf]
   (case-inf a-inf

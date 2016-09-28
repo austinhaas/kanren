@@ -2,11 +2,11 @@
   (:require
    [pettomato.kanren.cKanren.lvar :refer [lvar? lvar=?]]
    [pettomato.kanren.cKanren.pkg :refer [empty-s ext-s]]
-   #+clj
-   [pettomato.kanren.cKanren.case-inf :refer [case-inf]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
+   #?(:clj
+      [pettomato.kanren.cKanren.case-inf :refer [case-inf]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.cKanren.case-inf :refer [case-inf]])))
 
 (defn take* [f]
   (case-inf (force f)

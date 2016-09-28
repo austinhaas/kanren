@@ -3,11 +3,11 @@
   (:require
    [pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq]]
    [pettomato.kanren.muKanren.goals :refer [== emptyo conso membero appendo succeed anyo alwayso]]
-   #+clj
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde run* run]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde run* run]]))
+   #?(:clj
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde run* run]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde run* run]])))
 
 #_(take 5
         (run* [q]

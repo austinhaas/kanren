@@ -1,11 +1,11 @@
 (ns pettomato.kanren.rKanren.rank
   (:require
    [pettomato.kanren.rKanren.streams :refer [mzero choice]]
-   #+clj
-   [pettomato.kanren.rKanren.case-inf :refer [case-inf]])
-  #+cljs
-  (:require-macros
-   [pettomato.kanren.rKanren.case-inf :refer [case-inf]]))
+   #?(:clj
+      [pettomato.kanren.rKanren.case-inf :refer [case-inf]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.rKanren.case-inf :refer [case-inf]])))
 
 (defn set-rank [a-inf r]
   (assert a-inf)

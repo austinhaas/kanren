@@ -1,21 +1,17 @@
 (ns pettomato.kanren.muKanren.tests
   (:refer-clojure :exclude [==])
   (:require
-   #+clj
    [clojure.test :refer [is deftest]]
    [pettomato.kanren.util.llist :refer [empty-llist llist llist* llist->seq lcons]]
    [pettomato.kanren.muKanren.types :refer [lvar]]
    [pettomato.kanren.muKanren.core :refer [empty-s ext-s unify walk]]
    [pettomato.kanren.muKanren.goals :refer [== succeed fail emptyo conso firsto resto membero appendo anyo alwayso]]
    [pettomato.kanren.muKanren.extras :refer [reify-name walk*]]
-   #+clj
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde all run* run]]
-   #+cljs
-   [cemerick.cljs.test])
-  #+cljs
-  (:require-macros
-   [cemerick.cljs.test :refer [is deftest]]
-   [pettomato.kanren.muKanren.extras-macros :refer [fresh conde all run* run]]))
+   #?(:clj
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde all run* run]]))
+  #?(:cljs
+     (:require-macros
+      [pettomato.kanren.muKanren.extras-macros :refer [fresh conde all run* run]])))
 
 ;; =============================================================================
 ;; unify
