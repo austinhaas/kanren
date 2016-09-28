@@ -37,7 +37,7 @@ See the demo.clj files in each implementation subdirectory.
 
 ## License
 
-Copyright © 2014 Austin Haas
+Copyright © 2016 Austin Haas
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
